@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Elastic retrievals &mdash; lidar processing 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="lidar processing 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Raman retrievals" href="raman.html"/>
+        <link rel="prev" title="Checks for fitting signals" href="fit_checks.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lidar processing
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre processing functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_checks.html">Checks for fitting signals</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Elastic retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raman.html">Raman retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depolarization.html">Linear depolarization estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hsrl_retrieval.html">HSRL retrieval functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">lidar processing</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Elastic retrievals</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/elastic.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-elastic_retrievals">
+<span id="elastic-retrievals"></span><h1>Elastic retrievals<a class="headerlink" href="#module-elastic_retrievals" title="Permalink to this headline">¶</a></h1>
+<p>Retrieval of aerosol optical properties from elastic lidar signals.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Implement iterative retrieval (Di Girollamo et al. 1999)</p>
+</div>
+<dl class="function">
+<dt id="elastic_retrievals.klett_backscatter_aerosol">
+<code class="descclassname">elastic_retrievals.</code><code class="descname">klett_backscatter_aerosol</code><span class="sig-paren">(</span><em>range_corrected_signal</em>, <em>lidar_ratio_aerosol</em>, <em>beta_molecular</em>, <em>index_reference</em>, <em>reference_range</em>, <em>beta_aerosol_reference</em>, <em>bin_length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elastic_retrievals.html#klett_backscatter_aerosol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elastic_retrievals.klett_backscatter_aerosol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculation of aerosol backscatter coefficient using Klett retrieval.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>range_corrected_signal</strong> : float.</p>
+<blockquote>
+<div><p>The range corrected signal.</p>
+</div></blockquote>
+<p><strong>lidar_ratio_aerosol</strong> : float.</p>
+<blockquote>
+<div><p>The aerosol lidar ratio.</p>
+</div></blockquote>
+<p><strong>beta_molecular</strong> : array_like</p>
+<blockquote>
+<div><p>The molecular backscatter coefficient. (m^-1 * sr^-1)</p>
+</div></blockquote>
+<p><strong>index_reference</strong> : integer</p>
+<blockquote>
+<div><p>The index of the reference height. (bins)</p>
+</div></blockquote>
+<p><strong>reference_range</strong> : integer</p>
+<blockquote>
+<div><p>The reference height range. (bins)</p>
+</div></blockquote>
+<p><strong>beta_aerosol_reference</strong> : float</p>
+<blockquote>
+<div><p>The aerosol backscatter coefficient on the reference height. (m^-1 * sr^-1)</p>
+</div></blockquote>
+<p><strong>bin_length</strong> : float</p>
+<blockquote>
+<div><p>The vertical bin length. (m)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">beta_aerosol: float</p>
+<blockquote class="last">
+<div><p>The aerosol backscatter coefficient. (m^-1 * sr^-1)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>We estimate aerosol backscatter using the equation.</p>
+<div class="math">
+\[\beta_{aer}(R) = \frac{A}{B-C} - \beta_{mol}(R)\]</div>
+<p>where</p>
+<div class="math">
+\[ \begin{align}\begin{aligned}A &amp;= S(R) \cdot exp(-2\int_{R_{0}}^{R} [L_{aer}(r)-L_{mol}] \cdot \beta_{mol}(r) dr)\\B &amp;= \frac{S(R_0)}{\beta_{aer}(R_{0})+\beta_{mol}(R_0)}\\C &amp;= -2 \int_{R_0}^{R} L_{aer}(r) \cdot S(r) \cdot T(r, R_0) dr\end{aligned}\end{align} \]</div>
+<p>with</p>
+<div class="math">
+\[T(r,R_0) = exp(-2\int_{R_0}^{r}[L_{aer}(r')-L_{mol}] \cdot \beta_{mol}(r') \cdot dr')\]</div>
+<p>and</p>
+<ul class="simple">
+<li><span class="math">\(R\)</span> the distance from the source,</li>
+<li><span class="math">\(R_0\)</span> the distance between the source and the reference region,</li>
+<li><span class="math">\(\beta_{aer}\)</span> the aerosol backscatter coefficient,</li>
+<li><span class="math">\(\beta_{mol}\)</span> the molecular backscatter coefficient,</li>
+<li><span class="math">\(S(R)\)</span> the range corrected signal,</li>
+<li><span class="math">\(P\)</span> the signal due to particle and molecular scattering,</li>
+<li><span class="math">\(L_{aer}\)</span> the aerosol lidar ratio (extinction-to-backscatter coefficient),</li>
+<li><span class="math">\(L_{mol}\)</span> the molecular lidar ratio.</li>
+</ul>
+<p class="rubric">References</p>
+<p>Ansmann, A. and Muller, D.: Lidar and Atmospheric Aerosol Particles,
+in Lidar:  Range-Resolved Optical Remote Sensing of the Atmosphere, vol. 102,
+edited by C. Weitkamp, Springer, New York., 2005. p. 111.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="raman.html" class="btn btn-neutral float-right" title="Raman retrievals" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="fit_checks.html" class="btn btn-neutral" title="Checks for fitting signals" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Ioannis Binietoglou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

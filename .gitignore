@@ -1,0 +1,12 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+jupyter/lidar/.ipynb_checkpoints/
+*.nc
+*.m
+.idea/misc.xml
+.idea/misc.xml
+.idea/codeStyles/codeStyleConfig.xml
+*.xml
+*.iml

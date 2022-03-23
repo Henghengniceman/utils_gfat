@@ -1,0 +1,174 @@
+From  C:\Projects\Earlinet-Asos\Lidarsystems\calc_lidar_correction_parameters
+Running  GHK_0.9.8e4_Py3.7.py
+Reading input file  optic_input_example_lidar_ver0.9.8e.py
+for Lidar system:  xx ,  example lidar
+ --- Input parameters: value ±error / ±steps  ----------------------
+Laser: Qin =             0.9950± 0.0050/ 1
+       Vin =             0.0000± 0.0000/ 0
+       Rotation alpha =  0.0000± 2.0000/ 1
+       => DOP            0.9950  (degree of polarisation)
+Optic:        Diatt.,                 Tunpol,   Retard.,   Rotation (deg)
+Emitter       0.0000  ± 0.1000  / 0,  1.0000,   0±180/ 0,  0.0000± 1.0000/ 0
+Receiver      0.0000  ± 0.2000  / 1,  1.0000,   0±180/ 0,  0.0000± 0.1000/ 0
+Calibrator    0.999800± 0.000190/ 1,  0.4000,   0±180/ 3,  0.0000± 0.1000/ 0
+ Pol.-filter ------ 
+ERT, RotT       : 0.0010± 0.0010/ 0,  0.0000± 1.0000/ 0
+ERR, RotR       : 0.0010± 0.0010/ 1, 90.0000± 1.0000/ 1
+ PBS ------ 
+TP,TS           : 0.9500± 0.0100/ 1,  0.0050± 0.0010/ 1
+RP,RS           : 0.0500± 0.0000/ 0,  0.9950± 0.0000/ 0
+DT,TT,DR,TR,Y   : 0.9895, 0.4775, -0.9043, 0.5225, 1
+ Combined PBS + Pol.-filter ------ 
+DT,TT,DR,TR     : 1.0000, 0.4750, -0.9999, 0.4975
+LDRCal during calibration in calibration range:  0.200± 0.150/ 1
+ --- Additional ND filter attenuation (transmission) during the calibration ---
+TCalT,TCalR      : 1.0000± 0.0100/ 0,  0.1000± 0.0010/ 0
+
+Rotation Error Epsilon For Normal Measurements =  False
+linear polarizer before receiver
+PBS incidence plane is  parallel to reference plane and polarisation in reference plane is finally transmitted
+Parallel laser polarisation is detected in transmitted channel
+RS_RP_depend_on_TS_TP =  True
+
+===========================================================================================================
+ GR     , GT     , HR     , HT     ,  K(0.000),  K(0.004), K(0.02) ,  K(0.1) ,  K(0.2) ,  K(0.3) ,  K(0.45)
+ 1.00000, 1.00000,-0.99490, 0.99499,  0.96098,  0.96129,  0.96248,  0.96796,  0.97382,  0.97880,  0.98502
+===========================================================================================================
+
+Errors from neglecting GHK corrections and/or calibration:
+   LDRtrue, LDRunCorr,1/LDRunCorr,   LDRsimx, 1/LDRsimx,   LDRCorr
+   0.00400,   0.00673, 148.53471,   0.00687, 145.62357,   0.00400
+   0.02000,   0.02316,  43.17641,   0.02362,  42.33019,   0.02000
+   0.10000,   0.10528,   9.49823,   0.10739,   9.31207,   0.10000
+   0.30000,   0.31044,   3.22120,   0.31665,   3.15806,   0.30000
+   0.45000,   0.46418,   2.15434,   0.47346,   2.11212,   0.45000
+LDRsimx = LDR of the nominal system directly from measured signals without  calibration and GHK-corrections
+LDRunCorr = LDR of the nominal system directly from measured signals with calibration but without  GHK-corrections; electronic amplifications = 1 assumed
+LDRCorr = LDR calibrated and GHK-corrected
+
+Errors from signal noise:
+Signal counts: NI, NCalT, NCalR, NILfac, nNCal, nNI, stdev(NI)/NI =     100000,     50000,     50000,  2, 0, 0, 0.00316
+
+
+Lidar ID: example lidar
+
+minimum and maximum values of the distributions of possibly measured LDR for different LDRtrue
+LDRtrue  , LDRmin, LDRmax
+ 0.0040, 0.0011, 0.0085
+ 0.0200, 0.0160, 0.0249
+ 0.1000, 0.0901, 0.1067
+ 0.3000, 0.2754, 0.3111
+ 0.4500, 0.4145, 0.4642
+
+LDRtrue ,  mean  ,  median,    max-mean,  min-mean, std,   excess_kurtosis, skewness
+ 0.00400, 0.00461, 0.00479,     0.00452,-0.00285, 0.00208,   -1.26193, 0.00235
+ 0.02000, 0.02015, 0.02021,     0.00489,-0.00404, 0.00213,   -1.15133, 0.02018
+ 0.10000, 0.09780, 0.09779,     0.00672,-0.00995, 0.00294,   -0.34059, 0.06304
+ 0.30000, 0.29187, 0.29180,     0.01110,-0.02461, 0.00646,   -0.13664, 0.07559
+ 0.45000, 0.43739, 0.43739,     0.01418,-0.03548, 0.00939,   -0.14466, 0.07811
+
+minimum and maximum values of the distributions of signal ratios and calibration factors for different LDRtrue
+LDRtrue  , LDRsim, (max-min)/2, relerr
+ 0.00400,  0.00816,  0.00702,  0.86085
+ 0.02000,  0.02584,  0.01421,  0.54972
+ 0.10000,  0.11424,  0.05009,  0.43846
+ 0.30000,  0.33503,  0.13953,  0.41647
+ 0.45000,  0.50042,  0.20635,  0.41235
+LDRtrue  , Etax   , (max-min)/2, relerr
+ 0.00400,  1.10946,  0.50801,  0.45789
+ 0.02000,  1.10946,  0.50801,  0.45789
+ 0.10000,  1.10946,  0.50801,  0.45789
+ 0.30000,  1.10946,  0.50801,  0.45789
+ 0.45000,  1.10946,  0.50801,  0.45789
+LDRtrue  , Etapx  , (max-min)/2, relerr
+ 0.00400,  1.10948,  0.52005,  0.46873
+ 0.02000,  1.10948,  0.52005,  0.46873
+ 0.10000,  1.10948,  0.52005,  0.46873
+ 0.30000,  1.10948,  0.52005,  0.46873
+ 0.45000,  1.10948,  0.52005,  0.46873
+LDRtrue  , Etamx  , (max-min)/2, relerr
+ 0.00400,  1.10948,  0.52005,  0.46873
+ 0.02000,  1.10948,  0.52005,  0.46873
+ 0.10000,  1.10948,  0.52005,  0.46873
+ 0.30000,  1.10948,  0.52005,  0.46873
+ 0.45000,  1.10948,  0.52005,  0.46873
+
+LDRCorr: contribution to the total error (per mill)
+          of individual parameter errors        of combined parameter errors
+ at LDRtrue 0.004 0.020 0.100 0.300 0.450    0.004 0.020 0.100 0.300 0.450
+
+Qin           662   546   290   125    79       33    26    11     2     1
+RotL          161   133    70    30    19      109    89    45    17    10
+DiO             7     5     3     1     1       19    15     8     3     2
+DiC             4    11    25    34    37       28    73   173   237   254
+RetC           46   121   287   394   423        0     0     0     0     0
+TP              3     3     1     1     0        9     7     4     1     1
+TS              0     0     0     0     0        0     0     0     0     0
+ERaR           14    11     6     2     1        9     7     4     1     1
+RotaR           2     2     1     1     0       53    43    22     8     5
+LDRCal          2     5    11    15    16       27    68   161   220   237
+Sum           901   837   694   602   577      287   330   426   490   510
+
+LDRsim: contribution to the total error (per mill)
+          of individual parameter errors        of combined parameter errors
+ at LDRtrue 0.004 0.020 0.100 0.300 0.450    0.004 0.020 0.100 0.300 0.450
+
+Qin           395   195    55    18    11      161    80    22     7     4
+RotL           96    47    13     4     3      119    59    16     5     2
+DiO           455   716   900   948   957      244   127    45    24    20
+DiC             0     0     0     0     0        0     0     0     0     0
+RetC            0     0     0     0     0        0     0     0     0     0
+TP             14    20    24    25    26       15    12    11    11    10
+TS              1     2     2     2     2        1     1     1     1     1
+ERaR            8     4     1     0     0        2     1     0     0     0
+RotaR           1     0     0     0     0       28    13     3     1     0
+LDRCal          0     0     0     0     0        0     0     0     0     0
+Sum           970   985   996   999   999      569   293    99    48    38
+
+EtaX, D90: contribution to the total error (per mill)
+          of individual parameter errors        of combined parameter errors
+ at LDRtrue 0.004 0.020 0.100 0.300 0.450    0.004 0.020 0.100 0.300 0.450
+
+Qin             0     0     0     0     0        1     1     1     1     1
+RotL            0     0     0     0     0        0     0     0     0     0
+DiO           862   862   862   862   862       64    64    64    64    64
+DiC             5     5     5     5     5       33    33    33    33    33
+RetC           52    52    52    52    52       51    51    51    51    51
+TP             23    23    23    23    23       10    10    10    10    10
+TS              2     2     2     2     2        1     1     1     1     1
+ERaR            0     0     0     0     0        0     0     0     0     0
+RotaR           0     0     0     0     0        0     0     0     0     0
+LDRCal          3     3     3     3     3       31    31    31    31    31
+Sum           948   948   948   948   948      191   191   191   191   191
+
+Etapx, +45°: contribution to the total error (per mill)
+          of individual parameter errors        of combined parameter errors
+ at LDRtrue 0.004 0.020 0.100 0.300 0.450    0.004 0.020 0.100 0.300 0.450
+
+Qin             0     0     0     0     0        1     1     1     1     1
+RotL            0     0     0     0     0        7     7     7     7     7
+DiO           842   842   842   842   842       69    69    69    69    69
+DiC             5     5     5     5     5       34    34    34    34    34
+RetC           51    51    51    51    51       54    54    54    54    54
+TP             22    22    22    22    22       12    12    12    12    12
+TS              2     2     2     2     2        1     1     1     1     1
+ERaR            0     0     0     0     0        0     0     0     0     0
+RotaR          16    16    16    16    16        5     5     5     5     5
+LDRCal          3     3     3     3     3       33    33    33    33    33
+Sum           942   942   942   942   942      217   217   217   217   217
+
+Etamx -45°: contribution to the total error (per mill)
+          of individual parameter errors        of combined parameter errors
+ at LDRtrue 0.004 0.020 0.100 0.300 0.450    0.004 0.020 0.100 0.300 0.450
+
+Qin             0     0     0     0     0        1     1     1     1     1
+RotL            0     0     0     0     0        7     7     7     7     7
+DiO           842   842   842   842   842       69    69    69    69    69
+DiC             5     5     5     5     5       34    34    34    34    34
+RetC           51    51    51    51    51       54    54    54    54    54
+TP             22    22    22    22    22       12    12    12    12    12
+TS              2     2     2     2     2        1     1     1     1     1
+ERaR            0     0     0     0     0        0     0     0     0     0
+RotaR          16    16    16    16    16        5     5     5     5     5
+LDRCal          3     3     3     3     3       33    33    33    33    33
+Sum           942   942   942   942   942      217   217   217   217   217

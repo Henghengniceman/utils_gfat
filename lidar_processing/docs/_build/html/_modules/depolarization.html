@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>depolarization &mdash; lidar processing 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="lidar processing 0.1.0 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lidar processing
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pre_processing.html">Pre processing functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit_checks.html">Checks for fitting signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../elastic.html">Elastic retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../raman.html">Raman retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../depolarization.html">Linear depolarization estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hsrl_retrieval.html">HSRL retrieval functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">lidar processing</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      
+    <li>depolarization</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for depolarization</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Calculation of volume and particle depolarization coefficient.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">stats</span>
+
+
+<div class="viewcode-block" id="calibration_constant_cross_total_profile"><a class="viewcode-back" href="../depolarization.html#depolarization.calibration_constant_cross_total_profile">[docs]</a><span class="k">def</span> <span class="nf">calibration_constant_cross_total_profile</span><span class="p">(</span><span class="n">signal_cross_plus45</span><span class="p">,</span> <span class="n">signal_cross_minus45</span><span class="p">,</span>
+                                             <span class="n">signal_total_plus45</span><span class="p">,</span> <span class="n">signal_total_minus45</span><span class="p">,</span>
+                                             <span class="n">r_cross</span><span class="p">,</span> <span class="n">r_total</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the calibration constant profile, in a lidar system that is able</span>
+<span class="sd">    to detect the cross-to-total depolarization ratio.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_cross_plus45: vector</span>
+<span class="sd">       The input vertical profile from the cross channel. Calibrator angle phi=45.</span>
+<span class="sd">    signal_total_plus45: array</span>
+<span class="sd">       The input vertical profile from the total channel. Calibrator angle phi=45.</span>
+<span class="sd">    signal_cross_minus45: vector</span>
+<span class="sd">       The input vertical profile from the cross channel. Calibrator angle phi=-45.</span>
+<span class="sd">    signal_total_minus45: vector</span>
+<span class="sd">       The input vertical profile from the total channel. Calibrator angle phi=-45.</span>
+<span class="sd">    r_cross: float</span>
+<span class="sd">       The transmission ratio of the cross channel (Rc).</span>
+<span class="sd">    r_total: float</span>
+<span class="sd">       The transmission ratio of the total channel (Rt).</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    c_profile: vector</span>
+<span class="sd">       The vertical profile of the calibration constant.</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The calibration constant is calculated by the following formula:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">       C = \frac{1 + R_t}{1 + R_c} \cdot \sqrt{\delta&#39;_{+45} \cdot \delta&#39;_{-45}}</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Engelmann, R. et al. The automated multiwavelength Raman polarization and water-vapor lidar</span>
+<span class="sd">    Polly XT: the neXT generation. Atmos. Meas. Tech., 9, 1767-1784 (2016)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#   Calculate the signal ratio for the +45 position.</span>
+    <span class="n">delta_v45_plus</span> <span class="o">=</span> <span class="n">signal_cross_plus45</span> <span class="o">/</span> <span class="n">signal_total_plus45</span>
+    
+    <span class="c1">#   Calculate the signal ratio for the -45 position.</span>
+    <span class="n">delta_v45_minus</span> <span class="o">=</span> <span class="n">signal_cross_minus45</span> <span class="o">/</span> <span class="n">signal_total_minus45</span>
+    
+    <span class="c1">#   Calculate the calibration constant vertical profile.</span>
+    <span class="n">c_profile</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">r_total</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">r_cross</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">delta_v45_plus</span> <span class="o">*</span> <span class="n">delta_v45_minus</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">c_profile</span></div>
+
+
+<div class="viewcode-block" id="calibration_constant_cross_parallel_profile"><a class="viewcode-back" href="../depolarization.html#depolarization.calibration_constant_cross_parallel_profile">[docs]</a><span class="k">def</span> <span class="nf">calibration_constant_cross_parallel_profile</span><span class="p">(</span><span class="n">signal_cross_plus45</span><span class="p">,</span> <span class="n">signal_cross_minus45</span><span class="p">,</span>
+                                                <span class="n">signal_parallel_plus45</span><span class="p">,</span> <span class="n">signal_parallel_minus45</span><span class="p">,</span>
+                                                <span class="n">t_cross</span><span class="p">,</span> <span class="n">t_parallel</span><span class="p">,</span> <span class="n">r_cross</span><span class="p">,</span> <span class="n">r_parallel</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the calibration constant in a lidar system that is able to </span>
+<span class="sd">    detect the cross-to-parallel depolarization ratio.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_cross_plus45: vector</span>
+<span class="sd">       The input vertical profile from the cross channel. Calibrator angle phi=45.</span>
+<span class="sd">    signal_parallel_plus45: vector</span>
+<span class="sd">       The input vertical profile from the total channel. Calibrator angle phi=45.</span>
+<span class="sd">    signal_cross_minus45: vector</span>
+<span class="sd">       The input vertical profile from the cross channel. Calibrator angle phi=-45.</span>
+<span class="sd">    signal_parallel_minus45: vector</span>
+<span class="sd">       The input vertical profile from the total channel. Calibrator angle phi=-45.</span>
+<span class="sd">    t_cross: float</span>
+<span class="sd">       Transmittance of cross component through transmitted path.</span>
+<span class="sd">    t_parallel: float</span>
+<span class="sd">       Transmittance of parallel component through transmitted path.</span>
+<span class="sd">    r_cross: float</span>
+<span class="sd">       Transmittance of cross component through reflected path.</span>
+<span class="sd">    r_parallel: float</span>
+<span class="sd">       Transmittance of parallel component through reflected path.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    v_star_mean: float</span>
+<span class="sd">       Calibration constant&#39;s mean value (vertical axis).</span>
+<span class="sd">    v_star_sem: float</span>
+<span class="sd">       Calibration constant&#39;s standard error of the mean (vertical axis).</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The calibration constant is calculated by the following formula:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">       V^* = \frac{[1 + \delta^V tan^2 (\phi)]T_p + [tan^2 (\phi) + \delta^V]T_s}</span>
+<span class="sd">       {[1 + \delta^V tan^2 (\phi)]R_p + [tan^2 (\phi) + \delta^V]R_s} \cdot \delta^* (\phi)</span>
+<span class="sd">       </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Freudenthaler, V. et al. Depolarization ratio profiling at several wavelengths in pure</span>
+<span class="sd">    Saharan dust during SAMUM 2006. Tellus, 61B, 165-179 (2008)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#   Calculate the signal ratio for the +45 position.    </span>
+    <span class="n">delta_v45_plus</span> <span class="o">=</span> <span class="n">signal_cross_plus45</span> <span class="o">/</span> <span class="n">signal_parallel_plus45</span>
+    
+    <span class="c1">#   Calculate the signal ratio for the -45 position.</span>
+    <span class="n">delta_v45_minus</span> <span class="o">=</span> <span class="n">signal_cross_minus45</span> <span class="o">/</span> <span class="n">signal_parallel_minus45</span>
+    
+    <span class="c1">#   Calculate the calibration constant vertical profile.</span>
+    <span class="n">v_star_profile</span> <span class="o">=</span> <span class="p">((</span><span class="n">t_parallel</span> <span class="o">+</span> <span class="n">t_cross</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">r_parallel</span> <span class="o">+</span> <span class="n">r_cross</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">delta_v45_plus</span> <span class="o">*</span> <span class="n">delta_v45_minus</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">v_star_profile</span></div>
+
+
+<div class="viewcode-block" id="calibration_constant_value"><a class="viewcode-back" href="../depolarization.html#depolarization.calibration_constant_value">[docs]</a><span class="k">def</span> <span class="nf">calibration_constant_value</span><span class="p">(</span><span class="n">calibration_constant_profile</span><span class="p">,</span> <span class="n">first_bin</span><span class="p">,</span>
+                               <span class="n">bin_length</span><span class="p">,</span> <span class="n">lower_limit</span><span class="p">,</span> <span class="n">upper_limit</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the mean calibration constant and its standard error of the mean,</span>
+<span class="sd">    from the calibration constant profile.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    c_profile: vector</span>
+<span class="sd">       The vertical profile of the calibration constant.</span>
+<span class="sd">    first_bin: integer</span>
+<span class="sd">       The first bin of the system.</span>
+<span class="sd">    bin_length: float</span>
+<span class="sd">       The length of each bin. (in meters)</span>
+<span class="sd">    lower_limit: float</span>
+<span class="sd">       The lower vertical limit for the calculation. (in meters)</span>
+<span class="sd">    upper_limit: float</span>
+<span class="sd">       The lower vertical limit for the calculation. (in meters)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    c_mean: float</span>
+<span class="sd">       Calibration constant&#39;s mean value (vertical axis).</span>
+<span class="sd">    c_sem: float</span>
+<span class="sd">       Calibration constant&#39;s standard error of the mean (vertical axis).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#   Convert the lower and upper limit from meters to bins.</span>
+    <span class="n">lower_limit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">first_bin</span> <span class="o">+</span> <span class="p">(</span><span class="n">lower_limit</span> <span class="o">//</span> <span class="n">bin_length</span><span class="p">))</span>
+    <span class="n">upper_limit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">first_bin</span> <span class="o">+</span> <span class="p">(</span><span class="n">upper_limit</span> <span class="o">//</span> <span class="n">bin_length</span><span class="p">))</span>
+    
+    <span class="c1">#   Select the area of interest.</span>
+    <span class="n">c_profile</span> <span class="o">=</span> <span class="n">calibration_constant_profile</span><span class="p">[</span><span class="n">lower_limit</span><span class="p">:(</span><span class="n">upper_limit</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    
+    <span class="c1">#   Calculate statistics.    </span>
+    <span class="n">c_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">c_profile</span><span class="p">)</span>
+    <span class="n">c_sem</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">sem</span><span class="p">(</span><span class="n">c_profile</span><span class="p">)</span>
+    
+    <span class="c1">#   Return the statistics.</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">c_mean</span><span class="p">,</span> <span class="n">c_sem</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="volume_depolarization_cross_total"><a class="viewcode-back" href="../depolarization.html#depolarization.volume_depolarization_cross_total">[docs]</a><span class="k">def</span> <span class="nf">volume_depolarization_cross_total</span><span class="p">(</span><span class="n">signal_cross</span><span class="p">,</span> <span class="n">signal_total</span><span class="p">,</span> <span class="n">r_cross</span><span class="p">,</span> <span class="n">r_total</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;    </span>
+<span class="sd">    Calculate the linear volume depolarization ratio in a lidar system that is</span>
+<span class="sd">    able to detect the cross-to-total depolarization ratio.</span>
+<span class="sd">    The calibration factor from the delta-90 calibration is being used.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_cross: vector</span>
+<span class="sd">       The input vertical profile from the cross channel. Normal measurement (phi=0).</span>
+<span class="sd">    signal_total: vector</span>
+<span class="sd">       The input vertical profile from the total channel. Normal measurement (phi=0).</span>
+<span class="sd">    r_cross: float</span>
+<span class="sd">       The transmission ratio of the cross channel (Rc).</span>
+<span class="sd">    r_total: float</span>
+<span class="sd">       The transmission ratio of the total channel (Rt).</span>
+<span class="sd">    c: float</span>
+<span class="sd">       The calibration constant.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    delta_v: vector</span>
+<span class="sd">       The linear volume depolarization.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The linear volume depolarization ratio is calculated by the formula:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">       \delta^V = \frac{1 - \frac{\delta&#39;}{C}}{\frac{\delta&#39;R_t}{C} - R_C}</span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Engelmann, R. et al. The automated multiwavelength Raman polarization and water-vapor</span>
+<span class="sd">    lidar Polly XT: the neXT generation. Atmos. Meas. Tech., 9, 1767-1784 (2016)    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">delta_quote</span> <span class="o">=</span> <span class="n">signal_cross</span> <span class="o">/</span> <span class="n">signal_total</span>
+    <span class="n">delta_v</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">delta_quote</span> <span class="o">/</span> <span class="n">c</span><span class="p">))</span> <span class="o">/</span> <span class="p">((</span><span class="n">delta_quote</span> <span class="o">*</span> <span class="n">r_total</span> <span class="o">/</span> <span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">r_cross</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">delta_v</span></div>
+
+
+<div class="viewcode-block" id="volume_depolarization_cross_parallel"><a class="viewcode-back" href="../depolarization.html#depolarization.volume_depolarization_cross_parallel">[docs]</a><span class="k">def</span> <span class="nf">volume_depolarization_cross_parallel</span><span class="p">(</span><span class="n">signal_cross</span><span class="p">,</span> <span class="n">signal_parallel</span><span class="p">,</span>
+                                         <span class="n">t_cross</span><span class="p">,</span> <span class="n">t_parallel</span><span class="p">,</span> <span class="n">r_cross</span><span class="p">,</span> <span class="n">r_parallel</span><span class="p">,</span>
+                                         <span class="n">v_star</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;    </span>
+<span class="sd">    Calculate the linear volume depolarization ratio in a lidar system that is</span>
+<span class="sd">    able to detect the cross-to-parallel depolarization ratio.</span>
+<span class="sd">    The calibration factor from the delta-90 calibration is being used.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal_cross: vector</span>
+<span class="sd">       The input vertical profile from the cross channel. Normal measurement (phi=0).</span>
+<span class="sd">    signal_parallel: vector</span>
+<span class="sd">       The input vertical profile from the parallel channel. Normal measurement (phi=0).</span>
+<span class="sd">    t_cross: float</span>
+<span class="sd">       Transmittance of cross component through transmitted path.</span>
+<span class="sd">    t_parallel: float</span>
+<span class="sd">       Transmittance of parallel component through transmitted path.</span>
+<span class="sd">    r_cross: float</span>
+<span class="sd">       Transmittance of cross component through reflected path.</span>
+<span class="sd">    r_parallel: float</span>
+<span class="sd">       Transmittance of parallel component through reflected path.</span>
+<span class="sd">    v_star: float</span>
+<span class="sd">       The calibration constant.</span>
+<span class="sd">       </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    delta_v: vector</span>
+<span class="sd">       The linear volume depolarization.</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The linear volume depolarization ratio is calculated by the formula:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">       \delta^V = \frac{\frac{\delta^*}{V^*}T_p - R_p}{R_s - \frac{\delta^*}{V^*}T_s}</span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Freudenthaler, V. et al. Depolarization ratio profiling at several wavelengths in pure</span>
+<span class="sd">    Saharan dust during SAMUM 2006. Tellus, 61B, 165-179 (2008)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">delta_star</span> <span class="o">=</span> <span class="n">signal_cross</span> <span class="o">/</span> <span class="n">signal_parallel</span>
+    <span class="n">delta_v</span> <span class="o">=</span> <span class="p">((</span><span class="n">delta_star</span> <span class="o">*</span> <span class="n">t_parallel</span> <span class="o">/</span> <span class="n">v_star</span><span class="p">)</span> <span class="o">-</span> <span class="n">r_parallel</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">r_cross</span> <span class="o">-</span> <span class="p">(</span><span class="n">delta_star</span> <span class="o">*</span> <span class="n">t_cross</span> <span class="o">/</span> <span class="n">v_star</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">delta_v</span></div>
+
+
+<div class="viewcode-block" id="particle_depolarization"><a class="viewcode-back" href="../depolarization.html#depolarization.particle_depolarization">[docs]</a><span class="k">def</span> <span class="nf">particle_depolarization</span><span class="p">(</span><span class="n">delta_m</span><span class="p">,</span> <span class="n">delta_v</span><span class="p">,</span> <span class="n">molecular_backscatter</span><span class="p">,</span> <span class="n">particle_backscatter</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the linear particle depolarization ratio.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    delta_m: vector</span>
+<span class="sd">       The linear molecular depolarization ratio.</span>
+<span class="sd">    delta_v: vector</span>
+<span class="sd">       The linear volume depolarization ratio.</span>
+<span class="sd">    molecular_backscatter: vector</span>
+<span class="sd">       The molecular component of the total backscatter coefficient.</span>
+<span class="sd">    particle_backscatter: vector</span>
+<span class="sd">       The particle component of the total backscatter coefficient.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    delta_p: vector</span>
+<span class="sd">       The linear particle depolarization ratio.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The linear particle depolarization ratio is calculated by the formula:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">       \delta^p = \frac{(1 + \delta^m)\delta^V \mathbf{R} - (1 + \delta^V)\delta^m}</span>
+<span class="sd">       {(1 + \delta^m)\mathbf{R} - (1 + \delta^V)}</span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Freudenthaler, V. et al. Depolarization ratio profiling at several wavelengths in pure</span>
+<span class="sd">    Saharan dust during SAMUM 2006. Tellus, 61B, 165-179 (2008)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">molecular_backscatter</span> <span class="o">+</span> <span class="n">particle_backscatter</span><span class="p">)</span> <span class="o">/</span> <span class="n">molecular_backscatter</span>
+    <span class="n">delta_p</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">delta_m</span><span class="p">)</span> <span class="o">*</span> <span class="n">delta_v</span> <span class="o">*</span> <span class="n">r</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">delta_v</span><span class="p">)</span> <span class="o">*</span> <span class="n">delta_m</span><span class="p">)</span> \
+              <span class="o">/</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">delta_m</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">delta_v</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">delta_p</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Ioannis Binietoglou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

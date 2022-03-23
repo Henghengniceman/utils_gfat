@@ -1,0 +1,54 @@
+Some notes concerning Klett retrieval algorithm
+===============================================
+
+Introduction
+------------
+
+Following Weitkamp, K. Lidar. p.111 (Springer, 2005), the sum of the aerosol and molecular backscatter coefficients are given by the following formula:
+
+
+.. math::
+   \beta_{aer}(R) + \beta_{mol}(R) = \frac{S(R) \cdot exp(-2\int_{R_{0}}^{R} [L_{aer}(r)-L_{mol}] \cdot \beta_{mol}(r) \cdot dr)}{\frac{S(R_0)}{\beta_{aer}(R_{0})+\beta_{mol}(R_0)}-2\int_{R_0}^{R}L_{aer}(r) \cdot S(r) \cdot T(r,R_0)}) \cdot dr}
+
+With, :math:`T(r,R_0) = exp(-2\int_{R_0}^{r}[L_{aer}(r')-L_{mol}] \cdot \beta_{mol}(r') \cdot dr')`
+
+:math:`R`: distance from the source
+
+:math:`R_0` : distance between the source and the reference region
+
+:math:`\beta_{aer}`: aerosol backscatter coefficient :math:`(km^{-1} \cdot sr^{-1})`
+
+:math:`\beta_{mol}`: molecular backscatter coefficient :math:`(km^{-1} \cdot sr^{-1})`
+
+:math:`S(R)`: range corrected signal, :math:`S(R)=R^2 \cdot P(R)`
+
+:math:`P`: signal due to particle and molecular scattering
+
+:math:`L_{aer}`: aerosol lidar ratio (extinction-to-backscatter coefficient)
+
+:math:`L_{mol}`: molecular lidar ratio
+
+Note: All the definite integrals in the above equation, have the reference height :math:`R_{0}` as their lower limit, and the requested height :math:`R` as their upper limit. Interchanging the limits of definite integrals, is followed by the addition of a minus sign in front of the integral. For example, the region between :math:`x_{1}=2` and :math:`x_{2}=5`, bounded by the graph of :math:`f(x)=2x`, can be equivalently expressed with the following two ways:
+
+:math:`I = \int_{x_1}^{x_2}f(x) \cdot dx = \int_2^5 2x \cdot dx = [x^2]_2^5 = 5^2-2^2 = 21`
+
+:math:`I = -\int_{x_2}^{x_1}f(x) \cdot dx = \int_5^2 2x \cdot dx = [x^2]_5^2 = -(2^2-5^2) = 21`
+
+This basic rule is imperative for the correct analytical solution of the definite integral (i.e. when the :math:`f(x)` is given). However, the nature of Lidar signals demands a strictly numerical approach to the definite integral solution, since none of the functions to be integrated is known.
+
+
+Klett Algorithm
+---------------
+
+There are several established methods for the numerical integration. The most notable ones are the Riemann Sum, the Trapezoidal Rule, and the Simpson’s Rule. The Trapezoidal Rule requires two (2) orders of magnitude less calculations than the Riemann Sum, in order to reach the same approximation accuracy, while the Simpson’s Rule is almost one (1) order of magnitude more efficient that the Trapezoidal Rule.
+
+Despite the computational efficiency of Simpson’s Rule, the Trapezoidal Rule is more widely used in the Lidar community due to its formalistic simplicity. This numerical method demands the lower limit of the integral to be smaller than the upper limit, thus some adjustments in the Lidar equations are necessary.
+
+In the case of PollyXT, the values of the requested height R are identical to the altitude intervals that the bins dictate (e.g. 7.5m/bin). Caution is needed at this point, since the reference height can either be larger (R_0>R) or smaller (R_0<R) than the requested height, depending on the selected bin for the calculation. In order for the Trapezoidal Rule to work, however, the lower limit of the integration must always be smaller than the upper limit.
+Consequently, the above formula takes a different form for the numerical calculation, depending on the relative values of the reference and requested height:
+
+- :math:`R<R_0` :    :math:`\qquad ... +2 \int_{R}^{R_0}... \cdot dr \Rightarrow \sum_{R}^{R_{0}}[Trz(R,R+1)+Trz(R+2,R+3)+...+Trz(R_0-1,R_0)]`
+
+- :math:`R>R_0` :    :math:`\qquad ... -2 \int_{R_0}^{R}... \cdot dr \Rightarrow \sum_{R_0}^{R}[Trz(R_0,R_0+1)+Trz(R_0+2,R_0+3)+...+Trz(R-1,R)]`
+
+Where, :math:`Trz(x_0,x_0+1)` is the area of each trapezoid that is produced by two consecutive bins, :math:`x_0` and :math:`x_0+1`.

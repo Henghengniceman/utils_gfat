@@ -1,0 +1,60 @@
+From  D:\My Drive go.ugr.es\07. Software\jupyter\utils_gfat\GHK_0.9.8e4_Py3.7
+Running  GHK.py
+Reading input file  mulhacen_polarizer_casoJ.py
+for Lidar system:  gr ,  mulhacen
+ --- Input parameters: value ±error / ±steps  ----------------------
+Laser: Qin =             1.0000± 0.0000/ 0
+       Vin =             0.0000± 0.0000/ 0
+       Rotation alpha =  7.1000± 0.3000/ 1
+       => DOP            1.0000  (degree of polarisation)
+Optic:        Diatt.,                 Tunpol,   Retard.,   Rotation (deg)
+Emitter       0.0000  ± 0.1000  / 1,  1.0000,   0±180/ 1,  0.0000± 1.0000/ 1
+Receiver      0.6000  ± 0.1000  / 1,  1.0000,   0±180/ 1,  0.0000± 0.5000/ 1
+Calibrator    0.999800± 0.000100/ 1,  0.4000,   0±  0/ 0,  0.0000± 1.0000/ 0
+ Pol.-filter ------ 
+ERT, RotT       : 0.0010± 0.0005/ 1,  0.0000± 1.0000/ 1
+ERR, RotR       : 0.0010± 0.0005/ 1, 90.0000± 0.0000/ 1
+ PBS ------ 
+TP,TS           : 0.9500± 0.0100/ 1,  0.0050± 0.0050/ 1
+RP,RS           : 0.0500± 0.0000/ 1,  0.9950± 0.0000/ 1
+DT,TT,DR,TR,Y   : 0.9895, 0.4775, -0.9043, 0.5225, -1
+ Combined PBS + Pol.-filter ------ 
+DT,TT,DR,TR     : 1.0000, 0.4750, -0.9999, 0.4975
+LDRCal during calibration in calibration range:  0.004± 0.001/ 1
+ --- Additional ND filter attenuation (transmission) during the calibration ---
+TCalT,TCalR      : 1.0000± 0.0000/ 0,  1.0000± 0.0000/ 0
+
+Rotation Error Epsilon For Normal Measurements =  True
+linear polarizer before receiver
+PBS incidence plane is  perpendicular to reference plane and polarisation in reference plane is finally reflected
+Parallel laser polarisation is detected in reflected channel
+RS_RP_depend_on_TS_TP =  True
+
+LDRCal, IoutTp,   IoutTm,     IoutRp,        IoutRm,         It,          Ir,      dIoutTp,dIoutTm,dIoutRp,dIoutRm,dIt,   dIr
+0.00, 55888.1227, 93168.1728, 246485.8102, 402668.2733, 0.8573, 1561373.5129, 0.0042, 0.0033, 0.0020, 0.0016, 1.0800, 0.0008
+0.00, 56048.3895, 93031.3874, 247058.8635, 401996.8448, 0.8573, 1561373.5129, 0.0042, 0.0033, 0.0020, 0.0016, 1.0800, 0.0008
+0.02, 56676.8865, 92494.9739, 249306.1314, 399363.7920, 0.8573, 1561373.5129, 0.0042, 0.0033, 0.0020, 0.0016, 1.0800, 0.0008
+0.10, 59545.1186, 90046.9778, 259561.8447, 387347.4963, 0.8573, 1561373.5129, 0.0041, 0.0033, 0.0020, 0.0016, 1.0800, 0.0008
+0.20, 62592.6151, 87445.9819, 270458.5402, 374580.1822, 0.8573, 1561373.5129, 0.0040, 0.0034, 0.0019, 0.0016, 1.0800, 0.0008
+0.30, 65171.2661, 85245.1392, 279678.8209, 363777.0702, 0.8573, 1561373.5129, 0.0039, 0.0034, 0.0019, 0.0017, 1.0800, 0.0008
+0.45, 68372.3500, 82513.0587, 291124.6866, 350366.3106, 0.8573, 1561373.5129, 0.0038, 0.0035, 0.0019, 0.0017, 1.0800, 0.0008
+===========================================================================================================
+ GR     , GT     , HR     , HT     ,  K(0.000),  K(0.004), K(0.02) ,  K(0.1) ,  K(0.2) ,  K(0.3) ,  K(0.45)
+ 3.19952, 0.00010, 3.10176,-0.00006,  4.16828,  4.16674,  4.16073,  4.13423,  4.10745,  4.08569,  4.05957
+===========================================================================================================
+
+Errors from neglecting GHK corrections and/or calibration:
+   LDRtrue, LDRunCorr,1/LDRunCorr,   LDRsimx, 1/LDRsimx,   LDRCorr
+   0.00400,   0.00002,41727.29474,182118.24920,   0.00001,   0.00400
+   0.02000,   0.00003,39015.08225,170280.83218,   0.00001,   0.02000
+   0.10000,   0.00003,29456.25340,128561.44478,   0.00001,   0.10000
+   0.30000,   0.00005,18297.39898,79858.76603,   0.00001,   0.30000
+   0.45000,   0.00007,14265.98849,62263.72601,   0.00002,   0.45000
+LDRsimx = LDR of the nominal system directly from measured signals without  calibration and GHK-corrections
+LDRunCorr = LDR of the nominal system directly from measured signals with calibration but without  GHK-corrections; electronic amplifications = 1 assumed
+LDRCorr = LDR calibrated and GHK-corrected
+
+Errors from signal noise:
+Signal counts: NI, NCalT, NCalR, NILfac, nNCal, nNI, stdev(NI)/NI =      50000,   1000000,   1000000,  1, 0, 0, 0.00447
+
+

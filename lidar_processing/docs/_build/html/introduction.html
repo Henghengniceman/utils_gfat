@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction &mdash; lidar processing 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="lidar processing 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Pre processing functions" href="pre_processing.html"/>
+        <link rel="prev" title="Welcome to lidar processing’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lidar processing
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#todo">Todo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre processing functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_checks.html">Checks for fitting signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elastic.html">Elastic retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raman.html">Raman retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depolarization.html">Linear depolarization estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hsrl_retrieval.html">HSRL retrieval functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">lidar processing</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Introduction</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/introduction.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This module collects basic processing routines for aerosol lidar systems. Its aim is to act as a repository
+of pre-processing and optical processing routines, that can be used as a basic building block for any atmospheric
+lidar processing software.</p>
+<p>To make it reusable, the module includes only the pre-processing and optical processing functions.
+Reading data, visualization, etc. should be handled by different modules.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Here is a list of complementary lidar-related modules:</p>
+<dl class="last docutils">
+<dt>Molecular scattering</dt>
+<dd>The <a class="reference external" href="https://bitbucket.org/iannis_b/lidar_molecular">lidar_molecular</a>  module is a collection of scripts to calculate
+scattering parameters of molecular atmosphere.</dd>
+<dt>Raw lidar files</dt>
+<dd>The <a class="reference external" href="https://bitbucket.org/iannis_b/atmospheric-lidar">atmospheric-lidar</a> module contains classes to read raw lidar
+data files, including Licel binary files. It can be used for plotting (quicklooks) and converting raw data to
+SCC format.</dd>
+<dt>EARLINET optical file reader</dt>
+<dd>The <a class="reference external" href="https://bitbucket.org/iannis_b/earlinet-optical-file-reader">earlinet files</a> files can be use to <em>read</em> and
+plot aerosol properties stored in the EARLINET netdf file format.</dd>
+</dl>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The module is tested against Python 2.7.*</p>
+<p>The code is developed using the mercurial version control software. The repository is hosted on
+<a class="reference external" href="https://bitbucket.org/iannis_b/lidar_processing">bitbucket</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>For an introduction to mercurial version control software check out <a class="reference external" href="http://hginit.com/">http://hginit.com/</a>.</p>
+<p class="last">If you prefer to use a program with GUI, try using <a class="reference external" href="http://easyhg.org/">Easy mercurial</a>.</p>
+</div>
+<p>The suggested method to install is to clone the repository and install it using the -e command.</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">pip install -e ./lidar_processing</span>
+</pre></div>
+</div>
+<p>assuming that the module is cloned in the lidar_processing directory.</p>
+<p>The installation procedure is not yet fully automatic. You will need to install manually: numpy, scipy, and
+the <a class="reference external" href="https://bitbucket.org/iannis_b/lidar_molecular">lidar_molecular</a> module. The best way to install numpy and scipy
+is through a distribution like <a class="reference external" href="https://www.continuum.io/downloads">anaconda</a>.</p>
+<p>When this and the <em>molecular</em> modules mature, we should optimize the installation procedure.</p>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>Each function should be documented following the Numpy doc style.</p>
+<p>For details see the <a class="reference external" href="https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt">numpy documentation</a>.</p>
+<p>All docstrings are collected to a single documentation file using the <a class="reference external" href="http://www.sphinx-doc.org/">Sphinx</a> module.
+The documentation is located in the docs/ folder. The documentation is written in
+<a class="reference external" href="http://www.sphinx-doc.org/en/stable/rest.html">restructured text</a> format.</p>
+<p>You can rebuild the docs by running the following command from the docs folder.</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">make html</span>
+</pre></div>
+</div>
+<p>The documentation is also built automatically every time you push your changes to the repository. You can find it online
+in <a class="reference external" href="https://readthedocs.org/projects/lidar-processing/">Read the docs</a>.</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>Some tests, based on unittest2 library, are located in the lidar_processing/tests/ folder.</p>
+<p>You can run all the test using the commands from the project directory.</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python -m unittest discover</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="todo">
+<h2>Todo<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<p>The module is still in a very early stage so most things need to be done. Here is an indicative list of things to add:</p>
+<ul class="simple">
+<li>Signal gluing</li>
+<li>Optical product gluing (e.g. from near and far range telescopes).</li>
+<li>Error propagation (Monte Carlo method).</li>
+<li>Klett algorithm for elastic lidar retrieval</li>
+<li>Raman scattering algorithms for backscatter and extinction.</li>
+</ul>
+<p>Even if you don&#8217;t have something to code, there are other ways to contribute, e.g:</p>
+<ul class="simple">
+<li>Review/improve this documentation.</li>
+<li>Test that the implemented functions work correctly.</li>
+<li>Suggest missing routines or other improvements.</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pre_processing.html" class="btn btn-neutral float-right" title="Pre processing functions" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to lidar processing’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Ioannis Binietoglou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

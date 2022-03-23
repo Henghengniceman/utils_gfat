@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Raman retrievals &mdash; lidar processing 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="lidar processing 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Linear depolarization estimation" href="depolarization.html"/>
+        <link rel="prev" title="Elastic retrievals" href="elastic.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lidar processing
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre processing functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_checks.html">Checks for fitting signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elastic.html">Elastic retrievals</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Raman retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depolarization.html">Linear depolarization estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hsrl_retrieval.html">HSRL retrieval functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">lidar processing</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Raman retrievals</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/raman.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-raman_retrievals">
+<span id="raman-retrievals"></span><h1>Raman retrievals<a class="headerlink" href="#module-raman_retrievals" title="Permalink to this headline">¶</a></h1>
+<p>Retrievals of backscatter and extinction based on Raman measurements</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">These functions have not been tested!</p>
+</div>
+<dl class="function">
+<dt id="raman_retrievals.raman_backscatter">
+<code class="descclassname">raman_retrievals.</code><code class="descname">raman_backscatter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/raman_retrievals.html#raman_backscatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#raman_retrievals.raman_backscatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the aerosol backscatter coefficient based on:
+* Preprocessed elastic &amp; raman signals.
+* The retrieved aerosol extinction coefficient.</p>
+<p class="rubric">Notes</p>
+<p>The aerosol backscatter coefficient is given by the formula:</p>
+<div class="math">
+\[\beta_{aer}(R,\lambda_0) = [\beta_{aer}(R_0,\lambda_0) + \beta_{mol}(R_0,\lambda_0)]
+\cdot \frac{P(R_0,\lambda_{Ra}) \cdot P(R,\lambda_0)}{P(R_0,\lambda_0) \cdot P(R,\lambda_{Ra})}
+\cdot \frac{e^{-\int_{R_0}^{R} [\alpha_{aer}(r,\lambda_{Ra}) + \alpha_{mol}(r,\lambda_{Ra})]dr}}
+{e^{-\int_{R_0}^{R} [\alpha_{aer}(r,\lambda_0) + \alpha_{mol}(r,\lambda_0)]dr}} - \beta_{mol}(R,\lambda_0)\]</div>
+<p class="rubric">References</p>
+<p>Ansmann, A. et al. Independent measurement of extinction and backscatter profiles
+in cirrus clouds by using a combined Raman elastic-backscatter lidar.
+Applied Optics Vol. 31, Issue 33, pp. 7113-7131 (1992)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="raman_retrievals.raman_extinction">
+<code class="descclassname">raman_retrievals.</code><code class="descname">raman_extinction</code><span class="sig-paren">(</span><em>signal</em>, <em>dz</em>, <em>emission_wavelength</em>, <em>raman_wavelength</em>, <em>angstrom_aerosol</em>, <em>temperature</em>, <em>pressure</em>, <em>window_size</em>, <em>order</em>, <em>C=385.0</em>, <em>rh=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/raman_retrievals.html#raman_extinction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#raman_retrievals.raman_extinction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the aerosol extinction coefficient based on pre-processed Raman signals and molecular profiles.</p>
+<p>The derivative is calculated using a Savitzky-Golay filter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal</strong> : (M,) array</p>
+<blockquote>
+<div><p>The range_corrected molecular signal. Should be 1D array of size M.</p>
+</div></blockquote>
+<p><strong>dz</strong> : float</p>
+<blockquote>
+<div><p>Altitude step, used in the derivative [m]</p>
+</div></blockquote>
+<p><strong>emission_wavelength, raman_wavelength</strong> : float</p>
+<blockquote>
+<div><p>The emission and detection wavelengths [nm]</p>
+</div></blockquote>
+<p><strong>angstrom_aerosol</strong> : float</p>
+<blockquote>
+<div><p>The aerosol Angstrom exponent.</p>
+</div></blockquote>
+<p><strong>temperature</strong> : (M,) array</p>
+<blockquote>
+<div><p>Atmospheric temperature profile, same shape as the lidar signal [Kelvin]</p>
+</div></blockquote>
+<p><strong>pressure</strong> : (M,) array</p>
+<blockquote>
+<div><p>Atmospheric pressure profile, same shape as the lidar signal [hPa]</p>
+</div></blockquote>
+<p><strong>window_size</strong> : int</p>
+<blockquote>
+<div><p>the length of the smoothing window. Must be an odd integer number.</p>
+</div></blockquote>
+<p><strong>order</strong> : int</p>
+<blockquote>
+<div><p>The order of the polynomial used in the filtering.
+Must be less then <cite>window_size</cite> - 1.</p>
+</div></blockquote>
+<p><strong>C</strong> : float</p>
+<blockquote>
+<div><p>CO2 concentration [ppmv].</p>
+</div></blockquote>
+<p><strong>rh</strong> : float</p>
+<blockquote>
+<div><p>Relative humidity from 0 to 100 [%]</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>alpha_aer</strong> : arrays</p>
+<blockquote class="last">
+<div><p>The aerosol extinction coefficient [m-1]</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The aerosol extinction coefficient is given by the formula:</p>
+<div class="math">
+\[\alpha_{aer}(R,\lambda_0) = \frac{\frac{d}{dR}ln[\frac{N_{Ra}(R)}
+{S(R,\lambda_{Ra})}] - \alpha_{mol}(R,\lambda_0) - \alpha_{mol}(R,\lambda_{Ra})}
+{[1 + (\frac{\lambda_0}{\lambda_{Ra}})^{\alpha(R)}]}\]</div>
+<p class="rubric">References</p>
+<p>Ansmann, A. et al. Independent measurement of extinction and backscatter profiles
+in cirrus clouds by using a combined Raman elastic-backscatter lidar.
+Applied Optics Vol. 31, Issue 33, pp. 7113-7131 (1992)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="raman_retrievals.retrieve_raman_extinction">
+<code class="descclassname">raman_retrievals.</code><code class="descname">retrieve_raman_extinction</code><span class="sig-paren">(</span><em>signal</em>, <em>dz</em>, <em>emission_wavelength</em>, <em>raman_wavelength</em>, <em>alpha_molecular_emission</em>, <em>alpha_molecular_raman</em>, <em>angstrom_aerosol</em>, <em>number_density</em>, <em>window_size</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/raman_retrievals.html#retrieve_raman_extinction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#raman_retrievals.retrieve_raman_extinction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the aerosol extinction coefficient based on pre-processed Raman signals and molecular profiles.</p>
+<p>The derivative is calculated using a Savitzky-Golay filter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal</strong> : (M,) array</p>
+<blockquote>
+<div><p>The range-corrected molecular signal. Should be 1D array of size M.</p>
+</div></blockquote>
+<p><strong>dz</strong> : float</p>
+<blockquote>
+<div><p>Altitude step, used in the derivative [m]</p>
+</div></blockquote>
+<p><strong>emission_wavelength, raman_wavelength</strong> : float</p>
+<blockquote>
+<div><p>The emission and detection wavelength [nm]</p>
+</div></blockquote>
+<p><strong>alpha_molecular_emission, alpha_molecular_raman</strong> : (M,) array</p>
+<blockquote>
+<div><p>The molecular extinction coefficient at each point of the signal profile for emission and raman wavelength.</p>
+</div></blockquote>
+<p><strong>number_density</strong> : (M,) array</p>
+<blockquote>
+<div><p>The number density of the scattering molecule. E.g. the number density of N2 particles for typical Raman systems.</p>
+</div></blockquote>
+<p><strong>angstrom_aerosol: float</strong></p>
+<blockquote>
+<div><p>The aerosol Angstrom exponent.</p>
+</div></blockquote>
+<p><strong>window_size</strong> : int</p>
+<blockquote>
+<div><p>the length of the smoothing window. Must be an odd integer number.</p>
+</div></blockquote>
+<p><strong>order</strong> : int</p>
+<blockquote>
+<div><p>The order of the polynomial used in the filtering.
+Must be less then <cite>window_size</cite> - 1.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">alpha_aer: arrays</p>
+<blockquote class="last">
+<div><p>The aerosol extinction coefficient [m-1]</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="depolarization.html" class="btn btn-neutral float-right" title="Linear depolarization estimation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="elastic.html" class="btn btn-neutral" title="Elastic retrievals" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Ioannis Binietoglou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

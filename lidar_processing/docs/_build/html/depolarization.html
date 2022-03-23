@@ -1,0 +1,525 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Linear depolarization estimation &mdash; lidar processing 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="lidar processing 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="HSRL retrieval functions" href="hsrl_retrieval.html"/>
+        <link rel="prev" title="Raman retrievals" href="raman.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lidar processing
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre processing functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_checks.html">Checks for fitting signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elastic.html">Elastic retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raman.html">Raman retrievals</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Linear depolarization estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hsrl_retrieval.html">HSRL retrieval functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">lidar processing</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Linear depolarization estimation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/depolarization.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-depolarization">
+<span id="linear-depolarization-estimation"></span><h1>Linear depolarization estimation<a class="headerlink" href="#module-depolarization" title="Permalink to this headline">¶</a></h1>
+<p>Calculation of volume and particle depolarization coefficient.</p>
+<dl class="function">
+<dt id="depolarization.calibration_constant_cross_parallel_profile">
+<code class="descclassname">depolarization.</code><code class="descname">calibration_constant_cross_parallel_profile</code><span class="sig-paren">(</span><em>signal_cross_plus45</em>, <em>signal_cross_minus45</em>, <em>signal_parallel_plus45</em>, <em>signal_parallel_minus45</em>, <em>t_cross</em>, <em>t_parallel</em>, <em>r_cross</em>, <em>r_parallel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/depolarization.html#calibration_constant_cross_parallel_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#depolarization.calibration_constant_cross_parallel_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the calibration constant in a lidar system that is able to 
+detect the cross-to-parallel depolarization ratio.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal_cross_plus45: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the cross channel. Calibrator angle phi=45.</p>
+</div></blockquote>
+<p><strong>signal_parallel_plus45: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the total channel. Calibrator angle phi=45.</p>
+</div></blockquote>
+<p><strong>signal_cross_minus45: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the cross channel. Calibrator angle phi=-45.</p>
+</div></blockquote>
+<p><strong>signal_parallel_minus45: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the total channel. Calibrator angle phi=-45.</p>
+</div></blockquote>
+<p><strong>t_cross: float</strong></p>
+<blockquote>
+<div><p>Transmittance of cross component through transmitted path.</p>
+</div></blockquote>
+<p><strong>t_parallel: float</strong></p>
+<blockquote>
+<div><p>Transmittance of parallel component through transmitted path.</p>
+</div></blockquote>
+<p><strong>r_cross: float</strong></p>
+<blockquote>
+<div><p>Transmittance of cross component through reflected path.</p>
+</div></blockquote>
+<p><strong>r_parallel: float</strong></p>
+<blockquote>
+<div><p>Transmittance of parallel component through reflected path.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">v_star_mean: float</p>
+<blockquote>
+<div><p>Calibration constant&#8217;s mean value (vertical axis).</p>
+</div></blockquote>
+<p>v_star_sem: float</p>
+<blockquote class="last">
+<div><p>Calibration constant&#8217;s standard error of the mean (vertical axis).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The calibration constant is calculated by the following formula:</p>
+<div class="math">
+\[V^* = \frac{[1 + \delta^V tan^2 (\phi)]T_p + [tan^2 (\phi) + \delta^V]T_s}
+{[1 + \delta^V tan^2 (\phi)]R_p + [tan^2 (\phi) + \delta^V]R_s} \cdot \delta^* (\phi)\]</div>
+<p class="rubric">References</p>
+<p>Freudenthaler, V. et al. Depolarization ratio profiling at several wavelengths in pure
+Saharan dust during SAMUM 2006. Tellus, 61B, 165-179 (2008)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="depolarization.calibration_constant_cross_total_profile">
+<code class="descclassname">depolarization.</code><code class="descname">calibration_constant_cross_total_profile</code><span class="sig-paren">(</span><em>signal_cross_plus45</em>, <em>signal_cross_minus45</em>, <em>signal_total_plus45</em>, <em>signal_total_minus45</em>, <em>r_cross</em>, <em>r_total</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/depolarization.html#calibration_constant_cross_total_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#depolarization.calibration_constant_cross_total_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the calibration constant profile, in a lidar system that is able
+to detect the cross-to-total depolarization ratio.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal_cross_plus45: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the cross channel. Calibrator angle phi=45.</p>
+</div></blockquote>
+<p><strong>signal_total_plus45: array</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the total channel. Calibrator angle phi=45.</p>
+</div></blockquote>
+<p><strong>signal_cross_minus45: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the cross channel. Calibrator angle phi=-45.</p>
+</div></blockquote>
+<p><strong>signal_total_minus45: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the total channel. Calibrator angle phi=-45.</p>
+</div></blockquote>
+<p><strong>r_cross: float</strong></p>
+<blockquote>
+<div><p>The transmission ratio of the cross channel (Rc).</p>
+</div></blockquote>
+<p><strong>r_total: float</strong></p>
+<blockquote>
+<div><p>The transmission ratio of the total channel (Rt).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">c_profile: vector</p>
+<blockquote class="last">
+<div><p>The vertical profile of the calibration constant.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The calibration constant is calculated by the following formula:</p>
+<div class="math">
+\[C = \frac{1 + R_t}{1 + R_c} \cdot \sqrt{\delta'_{+45} \cdot \delta'_{-45}}\]</div>
+<p class="rubric">References</p>
+<p>Engelmann, R. et al. The automated multiwavelength Raman polarization and water-vapor lidar
+Polly XT: the neXT generation. Atmos. Meas. Tech., 9, 1767-1784 (2016)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="depolarization.calibration_constant_value">
+<code class="descclassname">depolarization.</code><code class="descname">calibration_constant_value</code><span class="sig-paren">(</span><em>calibration_constant_profile</em>, <em>first_bin</em>, <em>bin_length</em>, <em>lower_limit</em>, <em>upper_limit</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/depolarization.html#calibration_constant_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#depolarization.calibration_constant_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the mean calibration constant and its standard error of the mean,
+from the calibration constant profile.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>c_profile: vector</strong></p>
+<blockquote>
+<div><p>The vertical profile of the calibration constant.</p>
+</div></blockquote>
+<p><strong>first_bin: integer</strong></p>
+<blockquote>
+<div><p>The first bin of the system.</p>
+</div></blockquote>
+<p><strong>bin_length: float</strong></p>
+<blockquote>
+<div><p>The length of each bin. (in meters)</p>
+</div></blockquote>
+<p><strong>lower_limit: float</strong></p>
+<blockquote>
+<div><p>The lower vertical limit for the calculation. (in meters)</p>
+</div></blockquote>
+<p><strong>upper_limit: float</strong></p>
+<blockquote>
+<div><p>The lower vertical limit for the calculation. (in meters)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">c_mean: float</p>
+<blockquote>
+<div><p>Calibration constant&#8217;s mean value (vertical axis).</p>
+</div></blockquote>
+<p>c_sem: float</p>
+<blockquote class="last">
+<div><p>Calibration constant&#8217;s standard error of the mean (vertical axis).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="depolarization.particle_depolarization">
+<code class="descclassname">depolarization.</code><code class="descname">particle_depolarization</code><span class="sig-paren">(</span><em>delta_m</em>, <em>delta_v</em>, <em>molecular_backscatter</em>, <em>particle_backscatter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/depolarization.html#particle_depolarization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#depolarization.particle_depolarization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the linear particle depolarization ratio.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>delta_m: vector</strong></p>
+<blockquote>
+<div><p>The linear molecular depolarization ratio.</p>
+</div></blockquote>
+<p><strong>delta_v: vector</strong></p>
+<blockquote>
+<div><p>The linear volume depolarization ratio.</p>
+</div></blockquote>
+<p><strong>molecular_backscatter: vector</strong></p>
+<blockquote>
+<div><p>The molecular component of the total backscatter coefficient.</p>
+</div></blockquote>
+<p><strong>particle_backscatter: vector</strong></p>
+<blockquote>
+<div><p>The particle component of the total backscatter coefficient.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">delta_p: vector</p>
+<blockquote class="last">
+<div><p>The linear particle depolarization ratio.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The linear particle depolarization ratio is calculated by the formula:</p>
+<div class="math">
+\[\delta^p = \frac{(1 + \delta^m)\delta^V \mathbf{R} - (1 + \delta^V)\delta^m}
+{(1 + \delta^m)\mathbf{R} - (1 + \delta^V)}\]</div>
+<p class="rubric">References</p>
+<p>Freudenthaler, V. et al. Depolarization ratio profiling at several wavelengths in pure
+Saharan dust during SAMUM 2006. Tellus, 61B, 165-179 (2008)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="depolarization.volume_depolarization_cross_parallel">
+<code class="descclassname">depolarization.</code><code class="descname">volume_depolarization_cross_parallel</code><span class="sig-paren">(</span><em>signal_cross</em>, <em>signal_parallel</em>, <em>t_cross</em>, <em>t_parallel</em>, <em>r_cross</em>, <em>r_parallel</em>, <em>v_star</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/depolarization.html#volume_depolarization_cross_parallel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#depolarization.volume_depolarization_cross_parallel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the linear volume depolarization ratio in a lidar system that is
+able to detect the cross-to-parallel depolarization ratio.
+The calibration factor from the delta-90 calibration is being used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal_cross: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the cross channel. Normal measurement (phi=0).</p>
+</div></blockquote>
+<p><strong>signal_parallel: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the parallel channel. Normal measurement (phi=0).</p>
+</div></blockquote>
+<p><strong>t_cross: float</strong></p>
+<blockquote>
+<div><p>Transmittance of cross component through transmitted path.</p>
+</div></blockquote>
+<p><strong>t_parallel: float</strong></p>
+<blockquote>
+<div><p>Transmittance of parallel component through transmitted path.</p>
+</div></blockquote>
+<p><strong>r_cross: float</strong></p>
+<blockquote>
+<div><p>Transmittance of cross component through reflected path.</p>
+</div></blockquote>
+<p><strong>r_parallel: float</strong></p>
+<blockquote>
+<div><p>Transmittance of parallel component through reflected path.</p>
+</div></blockquote>
+<p><strong>v_star: float</strong></p>
+<blockquote>
+<div><p>The calibration constant.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">delta_v: vector</p>
+<blockquote class="last">
+<div><p>The linear volume depolarization.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The linear volume depolarization ratio is calculated by the formula:</p>
+<div class="math">
+\[\delta^V = \frac{\frac{\delta^*}{V^*}T_p - R_p}{R_s - \frac{\delta^*}{V^*}T_s}\]</div>
+<p class="rubric">References</p>
+<p>Freudenthaler, V. et al. Depolarization ratio profiling at several wavelengths in pure
+Saharan dust during SAMUM 2006. Tellus, 61B, 165-179 (2008)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="depolarization.volume_depolarization_cross_total">
+<code class="descclassname">depolarization.</code><code class="descname">volume_depolarization_cross_total</code><span class="sig-paren">(</span><em>signal_cross</em>, <em>signal_total</em>, <em>r_cross</em>, <em>r_total</em>, <em>c</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/depolarization.html#volume_depolarization_cross_total"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#depolarization.volume_depolarization_cross_total" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the linear volume depolarization ratio in a lidar system that is
+able to detect the cross-to-total depolarization ratio.
+The calibration factor from the delta-90 calibration is being used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal_cross: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the cross channel. Normal measurement (phi=0).</p>
+</div></blockquote>
+<p><strong>signal_total: vector</strong></p>
+<blockquote>
+<div><p>The input vertical profile from the total channel. Normal measurement (phi=0).</p>
+</div></blockquote>
+<p><strong>r_cross: float</strong></p>
+<blockquote>
+<div><p>The transmission ratio of the cross channel (Rc).</p>
+</div></blockquote>
+<p><strong>r_total: float</strong></p>
+<blockquote>
+<div><p>The transmission ratio of the total channel (Rt).</p>
+</div></blockquote>
+<p><strong>c: float</strong></p>
+<blockquote>
+<div><p>The calibration constant.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">delta_v: vector</p>
+<blockquote class="last">
+<div><p>The linear volume depolarization.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The linear volume depolarization ratio is calculated by the formula:</p>
+<div class="math">
+\[\delta^V = \frac{1 - \frac{\delta'}{C}}{\frac{\delta'R_t}{C} - R_C}\]</div>
+<p class="rubric">References</p>
+<p>Engelmann, R. et al. The automated multiwavelength Raman polarization and water-vapor
+lidar Polly XT: the neXT generation. Atmos. Meas. Tech., 9, 1767-1784 (2016)</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="hsrl_retrieval.html" class="btn btn-neutral float-right" title="HSRL retrieval functions" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="raman.html" class="btn btn-neutral" title="Raman retrievals" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Ioannis Binietoglou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

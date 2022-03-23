@@ -1,0 +1,842 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pre_processing &mdash; lidar processing 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="lidar processing 0.1.0 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lidar processing
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pre_processing.html">Pre processing functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit_checks.html">Checks for fitting signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../elastic.html">Elastic retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../raman.html">Raman retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../depolarization.html">Linear depolarization estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hsrl_retrieval.html">HSRL retrieval functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">lidar processing</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      
+    <li>pre_processing</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pre_processing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Function for pre-processing lidar signals.</span>
+
+<span class="sd">.. todo::</span>
+<span class="sd">   Decide how to handle error propagation. Current plan is to estimate errors using end-to-end Monte Carlo</span>
+<span class="sd">   simulations (not implemented yet), instead of  calculating errors in every step.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">fmin_l_bfgs_b</span>
+
+<span class="kn">from</span> <span class="nn">lidar_processing.fit_checks</span> <span class="k">import</span> <span class="n">sliding_check_correlation</span><span class="p">,</span> <span class="n">sliding_check_linear_fit_intercept</span><span class="p">,</span> \
+    <span class="n">sliding_check_residuals_not_gaussian</span><span class="p">,</span> <span class="n">sliding_check_min_max_ratio</span>
+
+
+<div class="viewcode-block" id="apply_range_correction"><a class="viewcode-back" href="../pre_processing.html#pre_processing.apply_range_correction">[docs]</a><span class="k">def</span> <span class="nf">apply_range_correction</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">altitude</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply range correction, i.e. multiply with z^2.</span>
+
+<span class="sd">    The input signal should have already been corrected for background offset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: array</span>
+<span class="sd">       The input signal array</span>
+<span class="sd">    altitude: array</span>
+<span class="sd">       The altitude array. It should be the same size as the signal.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rcs: array</span>
+<span class="sd">       The range corrected signal.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rcs</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">*</span> <span class="n">altitude</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">rcs</span></div>
+
+
+<div class="viewcode-block" id="correct_dead_time_nonparalyzable"><a class="viewcode-back" href="../pre_processing.html#pre_processing.correct_dead_time_nonparalyzable">[docs]</a><span class="k">def</span> <span class="nf">correct_dead_time_nonparalyzable</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="p">,</span> <span class="n">dead_time</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Apply non-paralizable dead time correction.</span>
+<span class="sd">        </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: integer array</span>
+<span class="sd">       The measured number on photons</span>
+<span class="sd">    measurement_interval: float</span>
+<span class="sd">       The total measurement interval in ns</span>
+<span class="sd">    dead_time: float</span>
+<span class="sd">       The detector system dead time in ns</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    corrected_signal: float array</span>
+<span class="sd">       The true number of photons arriving at the detector    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dead_time</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">signal</span>  <span class="c1"># Nothing to correct for 0 dead time.</span>
+
+    <span class="c1"># Maximum number of photons are limited by dead time</span>
+    <span class="n">max_photons</span> <span class="o">=</span> <span class="n">measurement_interval</span> <span class="o">/</span> <span class="n">dead_time</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">signal</span> <span class="o">&gt;</span> <span class="n">max_photons</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Signal contains photons above the maximum number permitted by the dead time value. Max: </span><span class="si">{0}</span><span class="s2">. Found: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">max_photons</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">signal</span><span class="p">)))</span>
+
+    <span class="n">corrected_signal</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">signal</span> <span class="o">*</span> <span class="n">dead_time</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">measurement_interval</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">corrected_signal</span></div>
+
+
+<div class="viewcode-block" id="correct_dead_time_paralyzable"><a class="viewcode-back" href="../pre_processing.html#pre_processing.correct_dead_time_paralyzable">[docs]</a><span class="k">def</span> <span class="nf">correct_dead_time_paralyzable</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="p">,</span> <span class="n">dead_time</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Apply paralyzable dead time correction.</span>
+
+<span class="sd">    For a paralyzable system, each measurement corresponds to two possible real</span>
+<span class="sd">    values. The solution offered here corresponds to the first branch [0, measurement_interval / dead_time]</span>
+
+<span class="sd">    The solution uses a L-BFGS-B algorithm for optimization.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       If you use this routine you should cite oneof the papers of the original authors.</span>
+<span class="sd">       See the `scipy &lt;http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html&gt;`_ website</span>
+<span class="sd">       for details.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: integer array</span>
+<span class="sd">       The measured number on photons</span>
+<span class="sd">    measurement_interval: float</span>
+<span class="sd">       The total measurement interval in ns</span>
+<span class="sd">    dead_time: float</span>
+<span class="sd">       The detector system dead time in ns</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    corrected_signal: float array</span>
+<span class="sd">       The true number of photons arriving at the detector    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dead_time</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">signal</span>  <span class="c1"># Nothing to correct for 0 dead time</span>
+
+    <span class="c1"># Maximum number of photons are limited by dead time + probability from Poisson</span>
+    <span class="n">max_photons</span> <span class="o">=</span> <span class="n">measurement_interval</span> <span class="o">/</span> <span class="n">dead_time</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">e</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">signal</span> <span class="o">&gt;</span> <span class="n">max_photons</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Signal contains photons above the maximum number permitted by </span><span class="se">\</span>
+<span class="s1">                            the dead time value. Max: </span><span class="si">{0}</span><span class="s1">. Found: </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_photons</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">signal</span><span class="p">)))</span>
+
+    <span class="c1"># The above equation has two solutions. We need to constrain the solutions</span>
+    <span class="c1"># in the first branch [0, measurement_interval / dead_time]</span>
+    <span class="n">signal_maximum</span> <span class="o">=</span> <span class="n">measurement_interval</span> <span class="o">/</span> <span class="n">dead_time</span>
+
+    <span class="c1"># Get the first estimate by non-paralyzable correction, for faster convergence</span>
+    <span class="n">first_estimate</span> <span class="o">=</span> <span class="n">correct_dead_time_nonparalyzable</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="p">,</span> <span class="n">dead_time</span><span class="p">)</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">signal_maximum</span><span class="p">),)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+    <span class="n">corrected_signal</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fmin_l_bfgs_b</span><span class="p">(</span><span class="n">_paralyzable_objective_function</span><span class="p">,</span> <span class="n">first_estimate</span><span class="p">,</span>
+                                           <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="p">,</span> <span class="n">dead_time</span><span class="p">),</span>
+                                           <span class="n">fprime</span><span class="o">=</span><span class="n">_paralyzable_jacobian</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">corrected_signal</span></div>
+
+
+<span class="k">def</span> <span class="nf">_paralyzable_objective_function</span><span class="p">(</span><span class="n">corrected_signal</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="p">,</span> <span class="n">dead_time</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function that calculates the objective function of the paralyzable dead-time correction case.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    corrected_signal: array</span>
+<span class="sd">       The estimate for the corrected signal.</span>
+<span class="sd">    signal: array</span>
+<span class="sd">       The measured signal.</span>
+<span class="sd">    measurement_interval: float</span>
+<span class="sd">       The total measurement interval in ns</span>
+<span class="sd">    dead_time: float</span>
+<span class="sd">       The detector system dead time in ns</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :float</span>
+<span class="sd">       The sum of squared residuals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">signal</span> <span class="o">-</span> <span class="p">(</span><span class="n">corrected_signal</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">corrected_signal</span> <span class="o">*</span> <span class="n">dead_time</span> <span class="o">/</span> <span class="n">measurement_interval</span><span class="p">)))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_paralyzable_jacobian</span><span class="p">(</span><span class="n">corrected_signal</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="p">,</span> <span class="n">dead_time</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function that calculates the jacobian (derivative) of the objective function</span>
+<span class="sd">    in respect with each parameter.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    corrected_signal: array</span>
+<span class="sd">       The estimate for the corrected signal.</span>
+<span class="sd">    signal: array</span>
+<span class="sd">       The measured signal.</span>
+<span class="sd">    measurement_interval: float</span>
+<span class="sd">       The total measurement interval in ns</span>
+<span class="sd">    dead_time: float</span>
+<span class="sd">       The detector system dead time in ns</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :array</span>
+<span class="sd">       The derivative of the objective function.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="n">corrected_signal</span> <span class="o">*</span> <span class="n">dead_time</span> <span class="o">/</span> <span class="n">measurement_interval</span>
+    <span class="n">diagonal_elements</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">factor</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">signal</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span> <span class="o">-</span> <span class="n">corrected_signal</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">diagonal_elements</span>
+
+
+<div class="viewcode-block" id="correct_dead_time_polynomial_count_rate"><a class="viewcode-back" href="../pre_processing.html#pre_processing.correct_dead_time_polynomial_count_rate">[docs]</a><span class="k">def</span> <span class="nf">correct_dead_time_polynomial_count_rate</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Correct dead time using a polynomial.</span>
+
+<span class="sd">    The coefficients will be passed to numpy.pollyval, so they should be order from higher to lower like</span>
+<span class="sd">    p[0]*x**(N-1) + p[1]*x**(N-2) + ... + p[N-2]*x + p[N-1]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: integer array</span>
+<span class="sd">       The measured count rate in MHz</span>
+<span class="sd">    coefficients: list</span>
+<span class="sd">       A list of polynomial coefficients for the correction</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    corrected_signal: float array</span>
+<span class="sd">       The true number of photons arriving at the detector</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The method is described in</span>
+<span class="sd">    Engelmann, R. et al.: The automated multiwavelength Raman polarization and water-vapor lidar PollyXT:</span>
+<span class="sd">    the neXT generation, Atmos. Meas. Tech., 9, 1767-1784, doi:10.5194/amt-9-1767-2016, 2016.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">corrected_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">coefficients</span><span class="p">,</span> <span class="n">signal</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">corrected_signal</span></div>
+
+
+<div class="viewcode-block" id="correct_dead_time_polynomial_counts"><a class="viewcode-back" href="../pre_processing.html#pre_processing.correct_dead_time_polynomial_counts">[docs]</a><span class="k">def</span> <span class="nf">correct_dead_time_polynomial_counts</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Correct dead time using a polynomial.</span>
+
+<span class="sd">    The coefficients will be passed to numpy.pollyval, so they should be order from higher to lower like</span>
+<span class="sd">    p[0]*x**(N-1) + p[1]*x**(N-2) + ... + p[N-2]*x + p[N-1]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: integer array</span>
+<span class="sd">       The measured number on photons</span>
+<span class="sd">    coefficients: list</span>
+<span class="sd">       A list of polynomial coefficients for the correction</span>
+<span class="sd">    measurement_interval: float</span>
+<span class="sd">       The total measurement interval in ns</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    corrected_signal: float array</span>
+<span class="sd">       The true number of photons arriving at the detector</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The method is described in</span>
+<span class="sd">    Engelmann, R. et al.: The automated multiwavelength Raman polarization and water-vapor lidar PollyXT:</span>
+<span class="sd">    the neXT generation, Atmos. Meas. Tech., 9, 1767-1784, doi:10.5194/amt-9-1767-2016, 2016.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">count_rate</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">measurement_interval</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1000.</span>  <span class="c1"># Convert to count rate</span>
+    <span class="n">corrected_count_rate</span> <span class="o">=</span> <span class="n">correct_dead_time_polynomial_count_rate</span><span class="p">(</span><span class="n">count_rate</span><span class="p">,</span> <span class="n">coefficients</span><span class="p">)</span>
+    <span class="n">corrected_signal</span> <span class="o">=</span> <span class="n">corrected_count_rate</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">measurement_interval</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.</span>  <span class="c1"># Covert back to photons</span>
+    <span class="k">return</span> <span class="n">corrected_signal</span></div>
+
+
+<div class="viewcode-block" id="subtract_background"><a class="viewcode-back" href="../pre_processing.html#pre_processing.subtract_background">[docs]</a><span class="k">def</span> <span class="nf">subtract_background</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">idx_min</span><span class="p">,</span> <span class="n">idx_max</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Subtracts the background level from the signal.</span>
+<span class="sd">            </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: float vector</span>
+<span class="sd">       The lidar signal vertical profile.</span>
+<span class="sd">    idx_min: integer</span>
+<span class="sd">       The minimum index to calculate the background level</span>
+<span class="sd">    idx_max: integer</span>
+<span class="sd">       The maximum index to calculate the background level</span>
+<span class="sd">       </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    corrected_signal: float array</span>
+<span class="sd">       The signal without the background level</span>
+<span class="sd">    background_mean: float</span>
+<span class="sd">       The mean value of the background</span>
+<span class="sd">    background_std:</span>
+<span class="sd">       The standard deviation of the background   </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">background_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">signal</span><span class="p">[</span><span class="n">idx_min</span><span class="p">:</span><span class="n">idx_max</span><span class="p">])</span>
+    <span class="n">background_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">signal</span><span class="p">[</span><span class="n">idx_min</span><span class="p">:</span><span class="n">idx_max</span><span class="p">])</span>
+
+    <span class="n">corrected_signal</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">-</span> <span class="n">background_mean</span>
+
+    <span class="k">return</span> <span class="n">corrected_signal</span><span class="p">,</span> <span class="n">background_mean</span><span class="p">,</span> <span class="n">background_std</span></div>
+
+
+<div class="viewcode-block" id="subtract_electronic_background"><a class="viewcode-back" href="../pre_processing.html#pre_processing.subtract_electronic_background">[docs]</a><span class="k">def</span> <span class="nf">subtract_electronic_background</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">background_signal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Subtract the electronic background profile from the signal.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: int or float array</span>
+<span class="sd">       The lidar signal profile.</span>
+<span class="sd">    background_signal: int or float array</span>
+<span class="sd">       Electronic background profile. It should be the same dimension as the signal array.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output_singal: array</span>
+<span class="sd">       The array with the corrected signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">corrected_signal</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">-</span> <span class="n">background_signal</span>
+    <span class="k">return</span> <span class="n">corrected_signal</span></div>
+
+
+<div class="viewcode-block" id="correct_overlap"><a class="viewcode-back" href="../pre_processing.html#pre_processing.correct_overlap">[docs]</a><span class="k">def</span> <span class="nf">correct_overlap</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">overlap_array</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">full_overlap_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Corrects the signal for a give overlap function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: int or float array</span>
+<span class="sd">       The lidar signal profile.</span>
+<span class="sd">    overlap_array: int or float array</span>
+<span class="sd">       An array containing the overlap function (from 0 to 1)</span>
+<span class="sd">    full_overlap_idx: int</span>
+<span class="sd">       Index of full overlap. If specified, all values above this index are considered 1.</span>
+
+<span class="sd">    -------</span>
+<span class="sd">    Returns</span>
+<span class="sd">    corrected_signal: array</span>
+<span class="sd">       The overlap-corrected signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">overlap_copy</span> <span class="o">=</span> <span class="n">overlap_array</span><span class="p">[:]</span>  <span class="c1"># Make a copy to avoid changing the data</span>
+
+    <span class="c1"># Set overlap function to 1 above the full overlap.</span>
+    <span class="k">if</span> <span class="n">full_overlap_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">overlap_copy</span><span class="p">[</span><span class="n">full_overlap_idx</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">corrected_signal</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">/</span> <span class="n">overlap_copy</span>
+    <span class="k">return</span> <span class="n">corrected_signal</span></div>
+
+
+<div class="viewcode-block" id="trigger_delay_to_bins"><a class="viewcode-back" href="../pre_processing.html#pre_processing.trigger_delay_to_bins">[docs]</a><span class="k">def</span> <span class="nf">trigger_delay_to_bins</span><span class="p">(</span><span class="n">trigger_delay_ns</span><span class="p">,</span> <span class="n">altitude_resolution</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the integer and fractional part of the trigger delay altitude shift.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trigger_delay_ns: float</span>
+<span class="sd">        Trigger delay value of the channel [ns]</span>
+<span class="sd">    altitude_resolution: float</span>
+<span class="sd">        Altitude resolution of the lidar [m]</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    integer_bins: int</span>
+<span class="sd">        Part of the trigger delay in meters that is equal to a multiple of</span>
+<span class="sd">        the altitude resolution</span>
+<span class="sd">    fraction_bins: float</span>
+<span class="sd">        The fractional part of the trigger delay in meters</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function can be used to divide the trigger delay so that the integer</span>
+<span class="sd">    part can be solved with correct_trigger_delay_bins() and the fractional part</span>
+<span class="sd">    with correct_trigger_delay_ns(). It is required for trigger delay error </span>
+<span class="sd">    propagation in the case of interpolation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">299792458</span>
+    <span class="n">trigger_delay_length</span> <span class="o">=</span> <span class="n">trigger_delay_ns</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">9</span> <span class="o">*</span> <span class="n">c</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">trigger_delay_bins</span> <span class="o">=</span> <span class="n">trigger_delay_length</span> <span class="o">/</span> <span class="n">altitude_resolution</span>
+    <span class="n">integer_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">trigger_delay_bins</span><span class="p">)</span>
+    <span class="n">fraction_bins</span> <span class="o">=</span> <span class="n">trigger_delay_bins</span> <span class="o">-</span> <span class="n">integer_bins</span>
+
+    <span class="k">return</span> <span class="n">integer_bins</span><span class="p">,</span> <span class="n">fraction_bins</span></div>
+
+
+<div class="viewcode-block" id="correct_trigger_delay_bins"><a class="viewcode-back" href="../pre_processing.html#pre_processing.correct_trigger_delay_bins">[docs]</a><span class="k">def</span> <span class="nf">correct_trigger_delay_bins</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">trigger_delay_bins</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Shifts the signal for one channel by a specified number of bins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: float array</span>
+<span class="sd">        The lidar signal profile</span>
+<span class="sd">    trigger_delay_bins: int</span>
+<span class="sd">        Number of bins to shift the signal</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    signal: float array</span>
+<span class="sd">        Corrected lidar signal profile (shifted)</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The number of bins to be shifted should be positive. For negative values</span>
+<span class="sd">    the shift will be done in reverse.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">trigger_delay_bins</span><span class="p">)</span>
+
+    <span class="c1"># Remove rolled bins</span>
+    <span class="k">if</span> <span class="n">trigger_delay_bins</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">signal</span><span class="p">[:</span><span class="n">trigger_delay_bins</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">signal</span><span class="p">[</span><span class="n">trigger_delay_bins</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">signal</span></div>
+
+
+<div class="viewcode-block" id="correct_trigger_delay_ns"><a class="viewcode-back" href="../pre_processing.html#pre_processing.correct_trigger_delay_ns">[docs]</a><span class="k">def</span> <span class="nf">correct_trigger_delay_ns</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">altitude</span><span class="p">,</span> <span class="n">trigger_delay_ns</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Corrects the trigger delay for one channel for trigger delay smaller than</span>
+<span class="sd">    the difference between 2 neighboring bins.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: int or float array</span>
+<span class="sd">        The lidar signal profile</span>
+<span class="sd">    altitude: float array</span>
+<span class="sd">        Altitude array [m]</span>
+<span class="sd">    trigger_delay_ns : float </span>
+<span class="sd">       Trigger delay value of the channel [ns]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    corrected_signal: int or float array</span>
+<span class="sd">       Corrected signal (shifted and interpolated to the initial altitude values)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">299792458</span>
+    <span class="n">corrected_altitude</span> <span class="o">=</span> <span class="n">altitude</span> <span class="o">+</span> <span class="n">trigger_delay_ns</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">9</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="n">corrected_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">altitude</span><span class="p">,</span> <span class="n">corrected_altitude</span><span class="p">,</span> <span class="n">signal</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">corrected_signal</span></div>
+
+
+<div class="viewcode-block" id="glue_signals_at_bins"><a class="viewcode-back" href="../pre_processing.html#pre_processing.glue_signals_at_bins">[docs]</a><span class="k">def</span> <span class="nf">glue_signals_at_bins</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">min_bin</span><span class="p">,</span> <span class="n">max_bin</span><span class="p">,</span> <span class="n">use_upper_as_reference</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Glue two signals at a given bin range. No checks are performed.</span>
+
+<span class="sd">    Both signals are assumed to have the same altitude grid. The final glued signal is calculated</span>
+<span class="sd">    performing a linear fade-in/fade-out operation in the glue region.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lower_signal: array</span>
+<span class="sd">       The low-range signal to be used.</span>
+<span class="sd">    upper_signal: array</span>
+<span class="sd">       The high-range signal to be used.</span>
+<span class="sd">    min_bin: int</span>
+<span class="sd">       The lower bin to perform the gluing</span>
+<span class="sd">    max_bin: int</span>
+<span class="sd">       The upper bin to perform the gluing</span>
+<span class="sd">    use_upper_as_reference: bool</span>
+<span class="sd">       If True, the upper signal is used as reference. Else, the lower signal is used.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    glued_signal: array</span>
+<span class="sd">       The glued signal array, same size as lower_signal and upper_signal.</span>
+<span class="sd">    c_lower, c_upper: floats</span>
+<span class="sd">       Calibration constant of the lower and upper signal. One of them will be 1, depending on the</span>
+<span class="sd">       value of `use_upper_as_reference` argument.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract the gluing region</span>
+    <span class="n">lower_gluing_region</span> <span class="o">=</span> <span class="n">lower_signal</span><span class="p">[</span><span class="n">min_bin</span><span class="p">:</span><span class="n">max_bin</span><span class="p">]</span>
+    <span class="n">upper_gluing_region</span> <span class="o">=</span> <span class="n">upper_signal</span><span class="p">[</span><span class="n">min_bin</span><span class="p">:</span><span class="n">max_bin</span><span class="p">]</span>
+
+    <span class="c1"># Find their linear relationship, using least squares</span>
+    <span class="n">slope_zero_intercept</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">lower_gluing_region</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">upper_gluing_region</span><span class="p">)</span>
+
+    <span class="c1"># Set the calibration constants</span>
+    <span class="k">if</span> <span class="n">use_upper_as_reference</span><span class="p">:</span>
+        <span class="n">c_upper</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">c_lower</span> <span class="o">=</span> <span class="n">slope_zero_intercept</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">c_upper</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">slope_zero_intercept</span>
+        <span class="n">c_lower</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Calculate weights to fade-in/fade-out signals in gluing region.</span>
+    <span class="n">gluing_length</span> <span class="o">=</span> <span class="n">max_bin</span> <span class="o">-</span> <span class="n">min_bin</span>
+
+    <span class="n">lower_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">)</span>
+    <span class="n">lower_weights</span><span class="p">[:</span><span class="n">min_bin</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">lower_weights</span><span class="p">[</span><span class="n">min_bin</span><span class="p">:</span><span class="n">max_bin</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">gluing_length</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">gluing_length</span><span class="p">)</span>
+
+    <span class="n">upper_weights</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">lower_weights</span>
+
+    <span class="c1"># Calculate the glued signal</span>
+    <span class="n">glued_signal</span> <span class="o">=</span> <span class="n">c_lower</span> <span class="o">*</span> <span class="n">lower_weights</span> <span class="o">*</span> <span class="n">lower_signal</span> <span class="o">+</span> <span class="n">c_upper</span> <span class="o">*</span> <span class="n">upper_weights</span> <span class="o">*</span> <span class="n">upper_signal</span>
+
+    <span class="k">return</span> <span class="n">glued_signal</span><span class="p">,</span> <span class="n">c_lower</span><span class="p">,</span> <span class="n">c_upper</span></div>
+
+
+<div class="viewcode-block" id="glue_signals"><a class="viewcode-back" href="../pre_processing.html#pre_processing.glue_signals">[docs]</a><span class="k">def</span> <span class="nf">glue_signals</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">correlation_threshold</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+                 <span class="n">intercept_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">gaussian_threshold</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">minmax_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">min_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_upper_as_reference</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Automatically glue two signals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lower_signal: array</span>
+<span class="sd">       The low-range signal to be used.</span>
+<span class="sd">    upper_signal: array</span>
+<span class="sd">       The high-range signal to be used.</span>
+<span class="sd">    window_length: int</span>
+<span class="sd">       The number of bins to be used for gluing</span>
+<span class="sd">    correlation_threshold: float</span>
+<span class="sd">       Threshold for the correlation coefficient</span>
+<span class="sd">    intercept_threshold:</span>
+<span class="sd">       Threshold for the linear fit intercept</span>
+<span class="sd">    gaussian_threshold:</span>
+<span class="sd">       Threshold for the Shapiro-Wilk p-value.</span>
+<span class="sd">    minmax_threshold:</span>
+<span class="sd">       Threshold for the min/max ratio</span>
+<span class="sd">    min_idx, max_idx: int</span>
+<span class="sd">       Minimum and maximum index to search for a gluing region.</span>
+<span class="sd">    use_upper_as_reference: bool</span>
+<span class="sd">       If True, the upper signal is used as reference. Else, the lower signal is used.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    glued_signal: array</span>
+<span class="sd">       The glued signal array, same size as lower_signal and upper_signal.</span>
+<span class="sd">    gluing_center_idx: int</span>
+<span class="sd">       Index choses to perform gluing.</span>
+<span class="sd">    gluing_score: float</span>
+<span class="sd">       The gluing score at the chosen point.</span>
+<span class="sd">    c_lower, c_upper: floats</span>
+<span class="sd">       Calibration constant of the lower and upper signal. One of them will be 1, depending on the</span>
+<span class="sd">       value of `use_upper_as_reference` argument.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lower_signal_cut</span> <span class="o">=</span> <span class="n">lower_signal</span><span class="p">[</span><span class="n">min_idx</span><span class="p">:</span><span class="n">max_idx</span><span class="p">]</span>
+    <span class="n">upper_signal_cut</span> <span class="o">=</span> <span class="n">upper_signal</span><span class="p">[</span><span class="n">min_idx</span><span class="p">:</span><span class="n">max_idx</span><span class="p">]</span>
+
+    <span class="c1"># Get passable gluing regions</span>
+    <span class="n">candidate_gluing_location</span> <span class="o">=</span> <span class="n">get_gluing_candidates</span><span class="p">(</span><span class="n">lower_signal_cut</span><span class="p">,</span> <span class="n">upper_signal_cut</span><span class="p">,</span> <span class="n">window_length</span><span class="p">,</span>
+                                                      <span class="n">correlation_threshold</span><span class="p">,</span> <span class="n">intercept_threshold</span><span class="p">,</span>
+                                                      <span class="n">gaussian_threshold</span><span class="p">,</span> <span class="n">minmax_threshold</span><span class="p">)</span>
+
+    <span class="c1"># Check that at least one point is suitable for gluing</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">candidate_gluing_location</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No suitable gluing regions found.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Find the optimal idx for gluing</span>
+    <span class="n">gluing_score</span> <span class="o">=</span> <span class="n">get_gluing_score</span><span class="p">(</span><span class="n">lower_signal_cut</span><span class="p">,</span> <span class="n">upper_signal_cut</span><span class="p">,</span> <span class="n">window_length</span><span class="p">)</span>
+
+    <span class="n">gluing_score</span><span class="p">[</span><span class="o">~</span><span class="n">candidate_gluing_location</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Zero score for rejected points</span>
+
+    <span class="n">gluing_center_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gluing_score</span><span class="p">)</span> <span class="o">+</span> <span class="n">min_idx</span>  <span class="c1"># Index of the original, uncut signals</span>
+
+    <span class="n">min_bin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">gluing_center_idx</span> <span class="o">-</span> <span class="n">window_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">max_bin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">gluing_center_idx</span> <span class="o">+</span> <span class="n">window_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Perform gluing</span>
+    <span class="n">glued_signal</span><span class="p">,</span> <span class="n">c_lower</span><span class="p">,</span> <span class="n">c_upper</span> <span class="o">=</span> <span class="n">glue_signals_at_bins</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">min_bin</span><span class="p">,</span> <span class="n">max_bin</span><span class="p">,</span> <span class="n">use_upper_as_reference</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">glued_signal</span><span class="p">,</span> <span class="n">gluing_center_idx</span><span class="p">,</span> <span class="n">gluing_score</span><span class="p">[</span><span class="n">gluing_center_idx</span><span class="p">],</span> <span class="n">c_lower</span><span class="p">,</span> <span class="n">c_upper</span></div>
+
+
+<div class="viewcode-block" id="get_gluing_candidates"><a class="viewcode-back" href="../pre_processing.html#pre_processing.get_gluing_candidates">[docs]</a><span class="k">def</span> <span class="nf">get_gluing_candidates</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">,</span> <span class="n">correlation_threshold</span><span class="p">,</span> <span class="n">intercept_threshold</span><span class="p">,</span>
+                          <span class="n">gaussian_threshold</span><span class="p">,</span> <span class="n">minmax_threshold</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a boolean array with points that satisfy the specified gluing criteria.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lower_signal: array</span>
+<span class="sd">       The low-range signal to be used.</span>
+<span class="sd">    upper_signal: array</span>
+<span class="sd">       The high-range signal to be used.</span>
+<span class="sd">    window_length: int</span>
+<span class="sd">       The number of bins to be used for gluing</span>
+<span class="sd">    correlation_threshold: float</span>
+<span class="sd">       Threshold for the correlation coefficient</span>
+<span class="sd">    intercept_threshold:</span>
+<span class="sd">       Threshold for the linear fit intercept</span>
+<span class="sd">    gaussian_threshold:</span>
+<span class="sd">       Threshold for the Shapiro-Wilk p-value.</span>
+<span class="sd">    minmax_threshold:</span>
+<span class="sd">       Threshold for the min/max ratio.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    gluing_candidates: boolean array</span>
+<span class="sd">       An array with True where the gluing criteria are satisfied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">correlation_mask</span> <span class="o">=</span> <span class="n">sliding_check_correlation</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">,</span> <span class="n">correlation_threshold</span><span class="p">)</span>
+    <span class="n">intercept_mask</span> <span class="o">=</span> <span class="n">sliding_check_linear_fit_intercept</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">,</span> <span class="n">intercept_threshold</span><span class="p">)</span>
+    <span class="n">not_gaussian_mask</span> <span class="o">=</span> <span class="n">sliding_check_residuals_not_gaussian</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">,</span>
+                                                             <span class="n">gaussian_threshold</span><span class="p">)</span>
+    <span class="n">minmax_ratio_large_mask</span> <span class="o">=</span> <span class="n">sliding_check_min_max_ratio</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">,</span> <span class="n">minmax_threshold</span><span class="p">)</span>
+
+    <span class="n">gluing_candidates</span> <span class="o">=</span> <span class="n">correlation_mask</span> <span class="o">&amp;</span> <span class="n">intercept_mask</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">not_gaussian_mask</span> <span class="o">&amp;</span> <span class="n">minmax_ratio_large_mask</span>
+
+    <span class="k">return</span> <span class="n">gluing_candidates</span></div>
+
+
+<div class="viewcode-block" id="get_gluing_score"><a class="viewcode-back" href="../pre_processing.html#pre_processing.get_gluing_score">[docs]</a><span class="k">def</span> <span class="nf">get_gluing_score</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the gluing score.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">correlation_values</span> <span class="o">=</span> <span class="n">sliding_check_correlation</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">)</span>
+    <span class="n">intercept_values</span> <span class="o">=</span> <span class="n">sliding_check_linear_fit_intercept</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">)</span>
+    <span class="n">minmax_ratio_values</span> <span class="o">=</span> <span class="n">sliding_check_min_max_ratio</span><span class="p">(</span><span class="n">lower_signal</span><span class="p">,</span> <span class="n">upper_signal</span><span class="p">,</span> <span class="n">window_length</span><span class="p">)</span>
+
+    <span class="n">intercept_scale_value</span> <span class="o">=</span> <span class="mf">40.</span>
+    <span class="n">intercept_values</span><span class="p">[</span><span class="n">intercept_values</span> <span class="o">&gt;</span> <span class="n">intercept_scale_value</span><span class="p">]</span> <span class="o">=</span> <span class="n">intercept_scale_value</span>
+    <span class="n">intercept_score</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">intercept_values</span> <span class="o">/</span> <span class="n">intercept_scale_value</span>
+
+    <span class="n">gluing_score</span> <span class="o">=</span> <span class="n">correlation_values</span> <span class="o">*</span> <span class="n">intercept_score</span> <span class="o">*</span> <span class="n">minmax_ratio_values</span>
+    <span class="k">return</span> <span class="n">gluing_score</span></div>
+
+
+<span class="k">def</span> <span class="nf">interpolate</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="bin_array"><a class="viewcode-back" href="../pre_processing.html#pre_processing.bin_array">[docs]</a><span class="k">def</span> <span class="nf">bin_array</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">bins</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs a binning (averaging) of the array.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    array: array</span>
+<span class="sd">       Input array</span>
+<span class="sd">    bins:</span>
+<span class="sd">       The number of bins to average.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    binned_array: array</span>
+<span class="sd">       The binned array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: Different function for photon-counting and analog?</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="counts_to_rate"><a class="viewcode-back" href="../pre_processing.html#pre_processing.counts_to_rate">[docs]</a><span class="k">def</span> <span class="nf">counts_to_rate</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="o">=</span><span class="mf">1.5</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform signal from counts to count rate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: array</span>
+<span class="sd">       The input signal array</span>
+<span class="sd">    measurement_interval: float</span>
+<span class="sd">       The total measurement interval in s</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rate: array</span>
+<span class="sd">       Count rate signal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rate</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">/</span> <span class="n">measurement_interval</span>
+    <span class="k">return</span> <span class="n">rate</span></div>
+
+
+<div class="viewcode-block" id="rate_to_counts"><a class="viewcode-back" href="../pre_processing.html#pre_processing.rate_to_counts">[docs]</a><span class="k">def</span> <span class="nf">rate_to_counts</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">measurement_interval</span><span class="o">=</span><span class="mf">1.5</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform signal from count rate to counts.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal: array</span>
+<span class="sd">       The input signal array</span>
+<span class="sd">    measurement_interval: float</span>
+<span class="sd">       The total measurement interval in s</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    counts: array</span>
+<span class="sd">       Counts signal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">*</span> <span class="n">measurement_interval</span>
+    <span class="k">return</span> <span class="n">counts</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Ioannis Binietoglou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

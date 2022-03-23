@@ -1,0 +1,848 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Pre processing functions &mdash; lidar processing 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="lidar processing 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="Checks for fitting signals" href="fit_checks.html"/>
+        <link rel="prev" title="Introduction" href="introduction.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lidar processing
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pre processing functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_checks.html">Checks for fitting signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elastic.html">Elastic retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raman.html">Raman retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depolarization.html">Linear depolarization estimation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hsrl_retrieval.html">HSRL retrieval functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">lidar processing</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Pre processing functions</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/pre_processing.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pre_processing">
+<span id="pre-processing-functions"></span><h1>Pre processing functions<a class="headerlink" href="#module-pre_processing" title="Permalink to this headline">¶</a></h1>
+<p>Function for pre-processing lidar signals.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Decide how to handle error propagation. Current plan is to estimate errors using end-to-end Monte Carlo
+simulations (not implemented yet), instead of  calculating errors in every step.</p>
+</div>
+<dl class="function">
+<dt id="pre_processing.apply_range_correction">
+<code class="descclassname">pre_processing.</code><code class="descname">apply_range_correction</code><span class="sig-paren">(</span><em>signal</em>, <em>altitude</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#apply_range_correction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.apply_range_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply range correction, i.e. multiply with z^2.</p>
+<p>The input signal should have already been corrected for background offset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: array</strong></p>
+<blockquote>
+<div><p>The input signal array</p>
+</div></blockquote>
+<p><strong>altitude: array</strong></p>
+<blockquote>
+<div><p>The altitude array. It should be the same size as the signal.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">rcs: array</p>
+<blockquote class="last">
+<div><p>The range corrected signal.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.bin_array">
+<code class="descclassname">pre_processing.</code><code class="descname">bin_array</code><span class="sig-paren">(</span><em>array</em>, <em>bins</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#bin_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.bin_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a binning (averaging) of the array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>array: array</strong></p>
+<blockquote>
+<div><p>Input array</p>
+</div></blockquote>
+<p><strong>bins:</strong></p>
+<blockquote>
+<div><p>The number of bins to average.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">binned_array: array</p>
+<blockquote class="last">
+<div><p>The binned array.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.correct_dead_time_nonparalyzable">
+<code class="descclassname">pre_processing.</code><code class="descname">correct_dead_time_nonparalyzable</code><span class="sig-paren">(</span><em>signal</em>, <em>measurement_interval</em>, <em>dead_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#correct_dead_time_nonparalyzable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.correct_dead_time_nonparalyzable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply non-paralizable dead time correction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: integer array</strong></p>
+<blockquote>
+<div><p>The measured number on photons</p>
+</div></blockquote>
+<p><strong>measurement_interval: float</strong></p>
+<blockquote>
+<div><p>The total measurement interval in ns</p>
+</div></blockquote>
+<p><strong>dead_time: float</strong></p>
+<blockquote>
+<div><p>The detector system dead time in ns</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">corrected_signal: float array</p>
+<blockquote class="last">
+<div><p>The true number of photons arriving at the detector</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.correct_dead_time_paralyzable">
+<code class="descclassname">pre_processing.</code><code class="descname">correct_dead_time_paralyzable</code><span class="sig-paren">(</span><em>signal</em>, <em>measurement_interval</em>, <em>dead_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#correct_dead_time_paralyzable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.correct_dead_time_paralyzable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply paralyzable dead time correction.</p>
+<p>For a paralyzable system, each measurement corresponds to two possible real
+values. The solution offered here corresponds to the first branch [0, measurement_interval / dead_time]</p>
+<p>The solution uses a L-BFGS-B algorithm for optimization.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you use this routine you should cite oneof the papers of the original authors.
+See the <a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html">scipy</a> website
+for details.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: integer array</strong></p>
+<blockquote>
+<div><p>The measured number on photons</p>
+</div></blockquote>
+<p><strong>measurement_interval: float</strong></p>
+<blockquote>
+<div><p>The total measurement interval in ns</p>
+</div></blockquote>
+<p><strong>dead_time: float</strong></p>
+<blockquote>
+<div><p>The detector system dead time in ns</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">corrected_signal: float array</p>
+<blockquote class="last">
+<div><p>The true number of photons arriving at the detector</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.correct_dead_time_polynomial_count_rate">
+<code class="descclassname">pre_processing.</code><code class="descname">correct_dead_time_polynomial_count_rate</code><span class="sig-paren">(</span><em>signal</em>, <em>coefficients</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#correct_dead_time_polynomial_count_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.correct_dead_time_polynomial_count_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Correct dead time using a polynomial.</p>
+<p>The coefficients will be passed to numpy.pollyval, so they should be order from higher to lower like
+p[0]*x**(N-1) + p[1]*x**(N-2) + ... + p[N-2]*x + p[N-1]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: integer array</strong></p>
+<blockquote>
+<div><p>The measured count rate in MHz</p>
+</div></blockquote>
+<p><strong>coefficients: list</strong></p>
+<blockquote>
+<div><p>A list of polynomial coefficients for the correction</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">corrected_signal: float array</p>
+<blockquote class="last">
+<div><p>The true number of photons arriving at the detector</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The method is described in
+Engelmann, R. et al.: The automated multiwavelength Raman polarization and water-vapor lidar PollyXT:
+the neXT generation, Atmos. Meas. Tech., 9, 1767-1784, doi:10.5194/amt-9-1767-2016, 2016.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.correct_dead_time_polynomial_counts">
+<code class="descclassname">pre_processing.</code><code class="descname">correct_dead_time_polynomial_counts</code><span class="sig-paren">(</span><em>signal</em>, <em>coefficients</em>, <em>measurement_interval</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#correct_dead_time_polynomial_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.correct_dead_time_polynomial_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Correct dead time using a polynomial.</p>
+<p>The coefficients will be passed to numpy.pollyval, so they should be order from higher to lower like
+p[0]*x**(N-1) + p[1]*x**(N-2) + ... + p[N-2]*x + p[N-1]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: integer array</strong></p>
+<blockquote>
+<div><p>The measured number on photons</p>
+</div></blockquote>
+<p><strong>coefficients: list</strong></p>
+<blockquote>
+<div><p>A list of polynomial coefficients for the correction</p>
+</div></blockquote>
+<p><strong>measurement_interval: float</strong></p>
+<blockquote>
+<div><p>The total measurement interval in ns</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">corrected_signal: float array</p>
+<blockquote class="last">
+<div><p>The true number of photons arriving at the detector</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The method is described in
+Engelmann, R. et al.: The automated multiwavelength Raman polarization and water-vapor lidar PollyXT:
+the neXT generation, Atmos. Meas. Tech., 9, 1767-1784, doi:10.5194/amt-9-1767-2016, 2016.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.correct_overlap">
+<code class="descclassname">pre_processing.</code><code class="descname">correct_overlap</code><span class="sig-paren">(</span><em>signal</em>, <em>overlap_array=None</em>, <em>full_overlap_idx=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#correct_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.correct_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Corrects the signal for a give overlap function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: int or float array</strong></p>
+<blockquote>
+<div><p>The lidar signal profile.</p>
+</div></blockquote>
+<p><strong>overlap_array: int or float array</strong></p>
+<blockquote>
+<div><p>An array containing the overlap function (from 0 to 1)</p>
+</div></blockquote>
+<p><strong>full_overlap_idx: int</strong></p>
+<blockquote>
+<div><p>Index of full overlap. If specified, all values above this index are considered 1.</p>
+</div></blockquote>
+<p><strong>&#8212;&#8212;-</strong></p>
+<p><strong>Returns</strong></p>
+<p><strong>corrected_signal: array</strong></p>
+<blockquote class="last">
+<div><p>The overlap-corrected signal.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.correct_trigger_delay_bins">
+<code class="descclassname">pre_processing.</code><code class="descname">correct_trigger_delay_bins</code><span class="sig-paren">(</span><em>signal</em>, <em>trigger_delay_bins</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#correct_trigger_delay_bins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.correct_trigger_delay_bins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shifts the signal for one channel by a specified number of bins.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: float array</strong></p>
+<blockquote>
+<div><p>The lidar signal profile</p>
+</div></blockquote>
+<p><strong>trigger_delay_bins: int</strong></p>
+<blockquote>
+<div><p>Number of bins to shift the signal</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">signal: float array</p>
+<blockquote class="last">
+<div><p>Corrected lidar signal profile (shifted)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The number of bins to be shifted should be positive. For negative values
+the shift will be done in reverse.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.correct_trigger_delay_ns">
+<code class="descclassname">pre_processing.</code><code class="descname">correct_trigger_delay_ns</code><span class="sig-paren">(</span><em>signal</em>, <em>altitude</em>, <em>trigger_delay_ns</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#correct_trigger_delay_ns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.correct_trigger_delay_ns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Corrects the trigger delay for one channel for trigger delay smaller than
+the difference between 2 neighboring bins.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: int or float array</strong></p>
+<blockquote>
+<div><p>The lidar signal profile</p>
+</div></blockquote>
+<p><strong>altitude: float array</strong></p>
+<blockquote>
+<div><p>Altitude array [m]</p>
+</div></blockquote>
+<p><strong>trigger_delay_ns</strong> : float</p>
+<blockquote>
+<div><p>Trigger delay value of the channel [ns]</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">corrected_signal: int or float array</p>
+<blockquote class="last">
+<div><p>Corrected signal (shifted and interpolated to the initial altitude values)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.counts_to_rate">
+<code class="descclassname">pre_processing.</code><code class="descname">counts_to_rate</code><span class="sig-paren">(</span><em>signal</em>, <em>measurement_interval=0.00015000000000000001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#counts_to_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.counts_to_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform signal from counts to count rate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: array</strong></p>
+<blockquote>
+<div><p>The input signal array</p>
+</div></blockquote>
+<p><strong>measurement_interval: float</strong></p>
+<blockquote>
+<div><p>The total measurement interval in s</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">rate: array</p>
+<blockquote class="last">
+<div><p>Count rate signal</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.get_gluing_candidates">
+<code class="descclassname">pre_processing.</code><code class="descname">get_gluing_candidates</code><span class="sig-paren">(</span><em>lower_signal</em>, <em>upper_signal</em>, <em>window_length</em>, <em>correlation_threshold</em>, <em>intercept_threshold</em>, <em>gaussian_threshold</em>, <em>minmax_threshold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#get_gluing_candidates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.get_gluing_candidates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a boolean array with points that satisfy the specified gluing criteria.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lower_signal: array</strong></p>
+<blockquote>
+<div><p>The low-range signal to be used.</p>
+</div></blockquote>
+<p><strong>upper_signal: array</strong></p>
+<blockquote>
+<div><p>The high-range signal to be used.</p>
+</div></blockquote>
+<p><strong>window_length: int</strong></p>
+<blockquote>
+<div><p>The number of bins to be used for gluing</p>
+</div></blockquote>
+<p><strong>correlation_threshold: float</strong></p>
+<blockquote>
+<div><p>Threshold for the correlation coefficient</p>
+</div></blockquote>
+<p><strong>intercept_threshold:</strong></p>
+<blockquote>
+<div><p>Threshold for the linear fit intercept</p>
+</div></blockquote>
+<p><strong>gaussian_threshold:</strong></p>
+<blockquote>
+<div><p>Threshold for the Shapiro-Wilk p-value.</p>
+</div></blockquote>
+<p><strong>minmax_threshold:</strong></p>
+<blockquote>
+<div><p>Threshold for the min/max ratio.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">gluing_candidates: boolean array</p>
+<blockquote class="last">
+<div><p>An array with True where the gluing criteria are satisfied.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.get_gluing_score">
+<code class="descclassname">pre_processing.</code><code class="descname">get_gluing_score</code><span class="sig-paren">(</span><em>lower_signal</em>, <em>upper_signal</em>, <em>window_length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#get_gluing_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.get_gluing_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the gluing score.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.glue_signals">
+<code class="descclassname">pre_processing.</code><code class="descname">glue_signals</code><span class="sig-paren">(</span><em>lower_signal</em>, <em>upper_signal</em>, <em>window_length=200</em>, <em>correlation_threshold=0.95</em>, <em>intercept_threshold=0.5</em>, <em>gaussian_threshold=0.2</em>, <em>minmax_threshold=0.5</em>, <em>min_idx=None</em>, <em>max_idx=None</em>, <em>use_upper_as_reference=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#glue_signals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.glue_signals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically glue two signals.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lower_signal: array</strong></p>
+<blockquote>
+<div><p>The low-range signal to be used.</p>
+</div></blockquote>
+<p><strong>upper_signal: array</strong></p>
+<blockquote>
+<div><p>The high-range signal to be used.</p>
+</div></blockquote>
+<p><strong>window_length: int</strong></p>
+<blockquote>
+<div><p>The number of bins to be used for gluing</p>
+</div></blockquote>
+<p><strong>correlation_threshold: float</strong></p>
+<blockquote>
+<div><p>Threshold for the correlation coefficient</p>
+</div></blockquote>
+<p><strong>intercept_threshold:</strong></p>
+<blockquote>
+<div><p>Threshold for the linear fit intercept</p>
+</div></blockquote>
+<p><strong>gaussian_threshold:</strong></p>
+<blockquote>
+<div><p>Threshold for the Shapiro-Wilk p-value.</p>
+</div></blockquote>
+<p><strong>minmax_threshold:</strong></p>
+<blockquote>
+<div><p>Threshold for the min/max ratio</p>
+</div></blockquote>
+<p><strong>min_idx, max_idx: int</strong></p>
+<blockquote>
+<div><p>Minimum and maximum index to search for a gluing region.</p>
+</div></blockquote>
+<p><strong>use_upper_as_reference: bool</strong></p>
+<blockquote>
+<div><p>If True, the upper signal is used as reference. Else, the lower signal is used.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">glued_signal: array</p>
+<blockquote>
+<div><p>The glued signal array, same size as lower_signal and upper_signal.</p>
+</div></blockquote>
+<p>gluing_center_idx: int</p>
+<blockquote>
+<div><p>Index choses to perform gluing.</p>
+</div></blockquote>
+<p>gluing_score: float</p>
+<blockquote>
+<div><p>The gluing score at the chosen point.</p>
+</div></blockquote>
+<p>c_lower, c_upper: floats</p>
+<blockquote class="last">
+<div><p>Calibration constant of the lower and upper signal. One of them will be 1, depending on the
+value of <cite>use_upper_as_reference</cite> argument.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.glue_signals_at_bins">
+<code class="descclassname">pre_processing.</code><code class="descname">glue_signals_at_bins</code><span class="sig-paren">(</span><em>lower_signal</em>, <em>upper_signal</em>, <em>min_bin</em>, <em>max_bin</em>, <em>use_upper_as_reference=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#glue_signals_at_bins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.glue_signals_at_bins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Glue two signals at a given bin range. No checks are performed.</p>
+<p>Both signals are assumed to have the same altitude grid. The final glued signal is calculated
+performing a linear fade-in/fade-out operation in the glue region.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lower_signal: array</strong></p>
+<blockquote>
+<div><p>The low-range signal to be used.</p>
+</div></blockquote>
+<p><strong>upper_signal: array</strong></p>
+<blockquote>
+<div><p>The high-range signal to be used.</p>
+</div></blockquote>
+<p><strong>min_bin: int</strong></p>
+<blockquote>
+<div><p>The lower bin to perform the gluing</p>
+</div></blockquote>
+<p><strong>max_bin: int</strong></p>
+<blockquote>
+<div><p>The upper bin to perform the gluing</p>
+</div></blockquote>
+<p><strong>use_upper_as_reference: bool</strong></p>
+<blockquote>
+<div><p>If True, the upper signal is used as reference. Else, the lower signal is used.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">glued_signal: array</p>
+<blockquote>
+<div><p>The glued signal array, same size as lower_signal and upper_signal.</p>
+</div></blockquote>
+<p>c_lower, c_upper: floats</p>
+<blockquote class="last">
+<div><p>Calibration constant of the lower and upper signal. One of them will be 1, depending on the
+value of <cite>use_upper_as_reference</cite> argument.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.rate_to_counts">
+<code class="descclassname">pre_processing.</code><code class="descname">rate_to_counts</code><span class="sig-paren">(</span><em>signal</em>, <em>measurement_interval=0.00015000000000000001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#rate_to_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.rate_to_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform signal from count rate to counts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: array</strong></p>
+<blockquote>
+<div><p>The input signal array</p>
+</div></blockquote>
+<p><strong>measurement_interval: float</strong></p>
+<blockquote>
+<div><p>The total measurement interval in s</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">counts: array</p>
+<blockquote class="last">
+<div><p>Counts signal</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.subtract_background">
+<code class="descclassname">pre_processing.</code><code class="descname">subtract_background</code><span class="sig-paren">(</span><em>signal</em>, <em>idx_min</em>, <em>idx_max</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#subtract_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.subtract_background" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtracts the background level from the signal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: float vector</strong></p>
+<blockquote>
+<div><p>The lidar signal vertical profile.</p>
+</div></blockquote>
+<p><strong>idx_min: integer</strong></p>
+<blockquote>
+<div><p>The minimum index to calculate the background level</p>
+</div></blockquote>
+<p><strong>idx_max: integer</strong></p>
+<blockquote>
+<div><p>The maximum index to calculate the background level</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">corrected_signal: float array</p>
+<blockquote>
+<div><p>The signal without the background level</p>
+</div></blockquote>
+<p>background_mean: float</p>
+<blockquote>
+<div><p>The mean value of the background</p>
+</div></blockquote>
+<p>background_std:</p>
+<blockquote class="last">
+<div><p>The standard deviation of the background</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.subtract_electronic_background">
+<code class="descclassname">pre_processing.</code><code class="descname">subtract_electronic_background</code><span class="sig-paren">(</span><em>signal</em>, <em>background_signal</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#subtract_electronic_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.subtract_electronic_background" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtract the electronic background profile from the signal.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal: int or float array</strong></p>
+<blockquote>
+<div><p>The lidar signal profile.</p>
+</div></blockquote>
+<p><strong>background_signal: int or float array</strong></p>
+<blockquote>
+<div><p>Electronic background profile. It should be the same dimension as the signal array.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">output_singal: array</p>
+<blockquote class="last">
+<div><p>The array with the corrected signal.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pre_processing.trigger_delay_to_bins">
+<code class="descclassname">pre_processing.</code><code class="descname">trigger_delay_to_bins</code><span class="sig-paren">(</span><em>trigger_delay_ns</em>, <em>altitude_resolution</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pre_processing.html#trigger_delay_to_bins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pre_processing.trigger_delay_to_bins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the integer and fractional part of the trigger delay altitude shift.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>trigger_delay_ns: float</strong></p>
+<blockquote>
+<div><p>Trigger delay value of the channel [ns]</p>
+</div></blockquote>
+<p><strong>altitude_resolution: float</strong></p>
+<blockquote>
+<div><p>Altitude resolution of the lidar [m]</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">integer_bins: int</p>
+<blockquote>
+<div><p>Part of the trigger delay in meters that is equal to a multiple of
+the altitude resolution</p>
+</div></blockquote>
+<p>fraction_bins: float</p>
+<blockquote class="last">
+<div><p>The fractional part of the trigger delay in meters</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This function can be used to divide the trigger delay so that the integer
+part can be solved with correct_trigger_delay_bins() and the fractional part
+with correct_trigger_delay_ns(). It is required for trigger delay error 
+propagation in the case of interpolation.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="fit_checks.html" class="btn btn-neutral float-right" title="Checks for fitting signals" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="introduction.html" class="btn btn-neutral" title="Introduction" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Ioannis Binietoglou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

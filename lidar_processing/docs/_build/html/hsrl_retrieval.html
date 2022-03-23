@@ -1,0 +1,470 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>HSRL retrieval functions &mdash; lidar processing 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="lidar processing 0.1.0 documentation" href="index.html"/>
+        <link rel="prev" title="Linear depolarization estimation" href="depolarization.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lidar processing
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pre_processing.html">Pre processing functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_checks.html">Checks for fitting signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elastic.html">Elastic retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="raman.html">Raman retrievals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depolarization.html">Linear depolarization estimation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">HSRL retrieval functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">lidar processing</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>HSRL retrieval functions</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/hsrl_retrieval.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-hsrl_retrieval">
+<span id="hsrl-retrieval-functions"></span><h1>HSRL retrieval functions<a class="headerlink" href="#module-hsrl_retrieval" title="Permalink to this headline">¶</a></h1>
+<p>Routines to process High Spectral Resolution Lidar (HSRL) signals.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p>Fix molecular scattering calculations. Currently the bacskcatter and extinction
+calculations are done using slightly different formulas.</p>
+<p class="last">Fix cabannes line calculations.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Functions under development, still untested.</p>
+</div>
+<dl class="function">
+<dt id="hsrl_retrieval.aerosol_backscatter">
+<code class="descclassname">hsrl_retrieval.</code><code class="descname">aerosol_backscatter</code><span class="sig-paren">(</span><em>signal_aerosol</em>, <em>signal_mol</em>, <em>temperature</em>, <em>pressure</em>, <em>wavelength</em>, <em>C=385.0</em>, <em>p_e=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hsrl_retrieval.html#aerosol_backscatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hsrl_retrieval.aerosol_backscatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the aerosol backscatter coefficient.</p>
+<p>The profiles of temperature and pressure are used, together with CO2 and 
+water vaport concentrations, to calculate the scattering properties of 
+the molecular atmosphere.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal_aerosol: array</strong></p>
+<blockquote>
+<div><p>The range-corrected aerosol photons arriving at the lidar.</p>
+</div></blockquote>
+<p><strong>signal_mol: array</strong></p>
+<blockquote>
+<div><p>The range_corrected molecular photons arriving at the lidar</p>
+</div></blockquote>
+<p><strong>temperature: array</strong></p>
+<blockquote>
+<div><p>The temperature profile for each measurement point [Kelvin]</p>
+</div></blockquote>
+<p><strong>pressure: array</strong></p>
+<blockquote>
+<div><p>The pressure profile for each measurement point [hPa]</p>
+</div></blockquote>
+<p><strong>wavelength: float</strong></p>
+<blockquote>
+<div><p>Emission wavelength [nm]</p>
+</div></blockquote>
+<p><strong>C: float</strong></p>
+<blockquote>
+<div><p>CO2 concentration [ppmv].</p>
+</div></blockquote>
+<p><strong>p_e: float</strong></p>
+<blockquote>
+<div><p>water-vapor pressure [hPa]</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">beta_aer: array</p>
+<blockquote class="last">
+<div><p>The aerosol backscatter coefficient [m-1 sr-1]</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="hsrl_retrieval.aerosol_extinction">
+<code class="descclassname">hsrl_retrieval.</code><code class="descname">aerosol_extinction</code><span class="sig-paren">(</span><em>signal</em>, <em>dz</em>, <em>temperature</em>, <em>pressure</em>, <em>wavelength</em>, <em>C=385.0</em>, <em>rh=0.0</em>, <em>window_size=11</em>, <em>order=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hsrl_retrieval.html#aerosol_extinction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hsrl_retrieval.aerosol_extinction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the aerosol extinction coefficient.</p>
+<p>The profiles of temperature and pressure are used, together with CO2 and 
+water vaport concentrations, to calculate the scattering properties of 
+the molecular atmosphere.</p>
+<p>The derivative is calculated using a Savitzky-Golay filter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal:</strong></p>
+<blockquote>
+<div><p>The range corrected molecular photons arriving at the lidar</p>
+</div></blockquote>
+<p><strong>dz: float</strong></p>
+<blockquote>
+<div><p>Altitude step, used in the derivative [m]</p>
+</div></blockquote>
+<p><strong>temperature: array</strong></p>
+<blockquote>
+<div><p>The temperature profile for each measurement point [Kelvin]</p>
+</div></blockquote>
+<p><strong>pressure: array</strong></p>
+<blockquote>
+<div><p>The pressure profile for each measurement point [hPa]</p>
+</div></blockquote>
+<p><strong>wavelength: float</strong></p>
+<blockquote>
+<div><p>Emission wavelength [nm]</p>
+</div></blockquote>
+<p><strong>C: float</strong></p>
+<blockquote>
+<div><p>CO2 concentration [ppmv].</p>
+</div></blockquote>
+<p><strong>rh: float</strong></p>
+<blockquote>
+<div><p>Relative humidity from 0 to 100 [%]</p>
+</div></blockquote>
+<p><strong>window_size</strong> : int</p>
+<blockquote>
+<div><p>the length of the smoothing window. Must be an odd integer number.</p>
+</div></blockquote>
+<p><strong>order</strong> : int</p>
+<blockquote>
+<div><p>the order of the polynomial used in the filtering.
+Must be less then <cite>window_size</cite> - 1.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">alpha_aer: arrays</p>
+<blockquote class="last">
+<div><p>The aerosol backscatter coefficient [m-1 sr-1]</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="hsrl_retrieval.hsr_calibration_constant">
+<code class="descclassname">hsrl_retrieval.</code><code class="descname">hsr_calibration_constant</code><span class="sig-paren">(</span><em>signal_total</em>, <em>signal_mol</em>, <em>Cmm</em>, <em>Cmt</em>, <em>Cam</em>, <em>Cat</em>, <em>scattering_ratio=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hsrl_retrieval.html#hsr_calibration_constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hsrl_retrieval.hsr_calibration_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the calibration constant for two HSR channels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal_total: array</strong></p>
+<blockquote>
+<div><p>The signal of the total channel.</p>
+</div></blockquote>
+<p><strong>signal_mol: array</strong></p>
+<blockquote>
+<div><p>The signal in the molecular channel</p>
+</div></blockquote>
+<p><strong>Cmm, Cmt, Cam, Cat: float or array</strong></p>
+<blockquote>
+<div><p>The cross-talk coefficients for the two channels. Cmm-&gt;Molecular signal to molecular channel, etc.</p>
+</div></blockquote>
+<p><strong>scattering_ratio: float</strong></p>
+<blockquote>
+<div><p>The ratio of aerosol to molecular backscatter at the specific altitude.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">calibration_constant: float</p>
+<blockquote>
+<div><p>The relative calibration constant eta_rho between the two channels (total / molecular).</p>
+</div></blockquote>
+<p>calibration_error: float</p>
+<blockquote class="last">
+<div><p>The uncertainty (standard deviation of the mean) for the constant.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="hsrl_retrieval.retrieve_channel">
+<code class="descclassname">hsrl_retrieval.</code><code class="descname">retrieve_channel</code><span class="sig-paren">(</span><em>signal_total</em>, <em>signal_mol</em>, <em>z</em>, <em>temperature</em>, <em>pressure</em>, <em>Cmm</em>, <em>Cmt</em>, <em>Cam</em>, <em>Cat</em>, <em>wavelength</em>, <em>cal_idx_min=800</em>, <em>cal_idx_max=1000</em>, <em>eta_rho=None</em>, <em>window_size=11</em>, <em>order=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hsrl_retrieval.html#retrieve_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hsrl_retrieval.retrieve_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the optical parameters from channel data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal_total, signal_mol: array</strong></p>
+<blockquote>
+<div><p>The total and molecular signals received from the system</p>
+</div></blockquote>
+<p><strong>z: array</strong></p>
+<blockquote>
+<div><p>The altitude of each range bin [m]</p>
+</div></blockquote>
+<p><strong>temperature: array</strong></p>
+<blockquote>
+<div><p>The temperature profile for each measurement point [Kelvin]</p>
+</div></blockquote>
+<p><strong>pressure: array</strong></p>
+<blockquote>
+<div><p>The pressure profile for each measurement point [hPa]</p>
+</div></blockquote>
+<p><strong>Cmm, Cmt, Cam, Cat: float or array</strong></p>
+<blockquote>
+<div><p>The cross-talk coefficients for the two channels. Cmm-&gt;Molecular signal 
+to molecular channel, etc.</p>
+</div></blockquote>
+<p><strong>wavelength: float</strong></p>
+<blockquote>
+<div><p>Emission wavelength [nm]</p>
+</div></blockquote>
+<p><strong>cal_idx_min, cal_idx_max: int</strong></p>
+<blockquote>
+<div><p>Array index for the calibration region</p>
+</div></blockquote>
+<p><strong>eta_rho: float</strong></p>
+<blockquote>
+<div><p>Calibration constant. If provided, the calibration indexes are ignored.</p>
+</div></blockquote>
+<p><strong>window_size</strong> : int</p>
+<blockquote>
+<div><p>the length of the smoothing window. Must be an odd integer number.</p>
+</div></blockquote>
+<p><strong>order</strong> : int</p>
+<blockquote>
+<div><p>the order of the polynomial used in the filtering.
+Must be less then <cite>window_size</cite> - 1.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">alpha_aer, beta_aer: array</p>
+<blockquote class="last">
+<div><p>Aerosol extinction coefficients [m-1] and bacsckatter coefficients[m-1 sr-1]</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="hsrl_retrieval.signal_unmixing">
+<code class="descclassname">hsrl_retrieval.</code><code class="descname">signal_unmixing</code><span class="sig-paren">(</span><em>signal_total</em>, <em>signal_mol</em>, <em>Cmm</em>, <em>Cmt</em>, <em>Cam</em>, <em>Cat</em>, <em>calibration_constant</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hsrl_retrieval.html#signal_unmixing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hsrl_retrieval.signal_unmixing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the molecular and aerosol photons arriving at the lidar.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>signal_total: array</strong></p>
+<blockquote>
+<div><p>The signal of the total channel.</p>
+</div></blockquote>
+<p><strong>signal_mol: array</strong></p>
+<blockquote>
+<div><p>The signal in the molecular channel</p>
+</div></blockquote>
+<p><strong>Cmm, Cmt, Cam, Cat: float or array</strong></p>
+<blockquote>
+<div><p>The cross-talk coefficients for the two channels. Cmm-&gt;Molecular signal to molecular channel, etc.</p>
+</div></blockquote>
+<p><strong>calibration_constant: float</strong></p>
+<blockquote>
+<div><p>The relative calibration constant eta_rho between the two channels (total / molecular).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">N_a, N_m: arrays</p>
+<blockquote class="last">
+<div><p>The aerosol and molecular photons arriving at the detector.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="depolarization.html" class="btn btn-neutral" title="Linear depolarization estimation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Ioannis Binietoglou.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

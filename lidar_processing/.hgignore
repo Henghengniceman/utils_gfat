@@ -1,0 +1,13 @@
+syntax: glob
+*.txt~
+*.orig
+re:^notebooks/\.ipynb_checkpoints/
+*.pyc
+*.py~
+*.rst~
+re:^\.idea/
+re:^lidar_processing\.egg-info/
+re:^\.cache/v/cache/
+re:^build/lib\.linux-x86_64-2\.7/lidar_processing/tests/
+re:^dist/
+re:^build/lib\.linux-x86_64-2\.7/lidar_processing/

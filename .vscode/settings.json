@@ -1,0 +1,7 @@
+{
+    "editor.rulers": [
+   80, 120 
+    ],
+    "python.pythonPath": "/home/meliodas/Documentos/code/venvs/gfat/bin/python",
+    "restructuredtext.languageServer.disabled": true
+}
